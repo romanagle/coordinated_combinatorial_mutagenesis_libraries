@@ -1,0 +1,54 @@
+#!/bin/bash
+set -euo pipefail
+set +e
+
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAGCAUGGCAUGAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00180 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAGCAUGGCAUGAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00180 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAGUGUGGUGUGAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00179 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAUUAUAUAUUUUAUAUAUUAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00114 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAUUAUAUAUUUUAUAUAUUAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00270 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAUUAUAUAUUUUAUAUAUUAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00003 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAACUAAACUAAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00118 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAACAAAACAAAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00124 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAACAAAACAAAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00035 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAACAAAACAAAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00097 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AUUACAAAAAGUAGAAAAAAUUACAAAAAGUAGAAAAAAAA --lib_size 200 --experiment RNCMPT00140 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAGUUUGGUUUGAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00100 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAGUUUGGUUUGAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00040 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAGUUUGGUUUGAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00099 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAACAACUUUAACAACUUUAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00058 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAUAAAAGUAUAAAAGUAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00119 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAACAAAACAAAAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00078 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAGCAUGGCAUGAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00168 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAAAAGGAAGGAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00016 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAACAAAGACAAAACAAAGACAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00019 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAACAAAGACAAAACAAAGACAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00088 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAACAAAGACAAAACAAAGACAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00089 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAACAAAGACAAAACAAAGACAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00090 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAGGUAGUAGGGUAGUAGAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00024 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAAGGGAAGGGAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00160 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAUCCCAAUCCCAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00026 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAUUAAUUUAAUUAAUUUAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00112 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAUUAAUUUAAUUAAUUUAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00117 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAUUAAUUUAAUUAAUUUAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00136 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAUUAAUUUAAUUAAUUUAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00032 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAAACAUCAUAAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00033 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAACAUUCAUUAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00172 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAAUAAAUAAAAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00169 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAGGAGAGGAGAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00162 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAAAUAGUAGAAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00041 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAAAUAGUAGAAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00176 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAACCCAACCCAACCCAAAACCCAACCCAACCCAAAAAA --lib_size 200 --experiment RNCMPT00186 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAUGGAGAGGAACUGGAGAGGAACAAAAAAAAAA --lib_size 200 --experiment RNCMPT00177 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAAUCUUUCUUAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00268 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAAUCUUUCUUAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00269 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAACUAAUAUAAUACUAAUAUAAUAAAAAAAAAA --lib_size 200 --experiment RNCMPT00047 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAUGUGUUGUGUAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00076 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAAAUUUUUUAAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00165 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAAAUUUUUUAAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00077 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAUUUUUUUUAUAGGUUUUUUUUUAUAGGUAAAAAAA --lib_size 200 --experiment RNCMPT00079 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAAUAAAUAAAAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00062 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAUAUAUAAUAUAUAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00031 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAAAAAGAAAAAGAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00042 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAACAGGCAGGAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00111 --subdir postabrcms --activity lowactseqnomotif
+CUDA_VISIBLE_DEVICES=7 python designed_seq.py --seq AAAAAAAAAAAAAAAACAGGCAGGAAAAAAAAAAAAAAAAA --lib_size 200 --experiment RNCMPT00082 --subdir postabrcms --activity lowactseqnomotif
