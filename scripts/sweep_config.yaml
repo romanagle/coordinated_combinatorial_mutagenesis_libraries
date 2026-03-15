@@ -1,0 +1,64 @@
+program: scripts/wandb_sweep.py
+
+# Fixed args passed to every agent trial.
+# Edit --seq and --experiment before launching.
+command:
+  - ${env}
+  - python
+  - ${program}
+  - --seq
+  - AAAAAAACCCCCAAAAAAUCGGCUGGACCGGGAAAAAAAAAAAAAAACCCCCAAAAAAUCGGCUGGACCGGGAACCCCCAAAAAAUCGGCUGGACCGGGAA
+  - --lib_size
+  - "5000"
+  - --eval_pool
+  - "200000"
+  - --epochs
+  - "200"
+  - ${args}    # wandb injects swept hyperparameters here
+
+method: bayes
+metric:
+  name: rho_curated_mean
+  goal: maximize
+
+parameters:
+  # ── Mutation rate ─────────────────────────────────────────────────────────
+  # Number of positions mutated per sequence. mut_rate passed to SQUID = this / 41.
+  # Must be <= seq_length (enforced in the script).
+  mut_rate_int:
+    values: [2, 4, 6, 8, 10, 14]
+
+  # ── Sequence length ───────────────────────────────────────────────────────
+  # Sweeps over different prefix lengths of the --seq argument.
+  # No upper limit from the oracle — extend --seq and add values here as needed.
+  seq_length:
+    values: [15, 20, 25, 30, 35, 41, 60, 80, 100]
+  # To test longer sequences (e.g. 60, 80, 100 nt) provide a longer --seq above.
+
+  # ── Potts coupling initialisation ────────────────────────────────────────
+  # p_edge: probability that any pair (i,j) gets a non-zero coupling
+  potts_p_edge:
+    distribution: uniform
+    min: 0.3
+    max: 0.95
+
+  # df: degrees of freedom for the t-distribution used to sample coupling magnitudes.
+  # Lower df → heavier tails (stronger outlier couplings).
+  potts_df:
+    values: [2.0, 5.0, 10.0, 20.0]
+
+  # lambda_J: global scale factor applied to sampled coupling matrices
+  potts_lambda_J:
+    distribution: uniform
+    min: 0.5
+    max: 5.0
+
+  # p_rescue: fraction of coupling entries zeroed after sampling (sparsifies J)
+  potts_p_rescue:
+    distribution: uniform
+    min: 0.0
+    max: 0.3
+
+  # ── Reproducibility seed per run ─────────────────────────────────────────
+  seed:
+    values: [0, 1, 2]

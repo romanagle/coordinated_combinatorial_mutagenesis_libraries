@@ -125,6 +125,26 @@ def init_tanh_nonlin(rng, alpha_loc=1.0, alpha_scale=0.5, beta_scale=1.0, out_bi
     return dict(tanh_alpha=tanh_alpha, tanh_beta=tanh_beta, out_scale=1.0, out_bias=out_bias)
 
 
+def init_sigmoid_nonlin(s_raw):
+    """Sigmoid link parameters for scale-only-normalized energies.
+
+    With scale-only normalization (s_scaled = s / std), WT is always at z=0.
+    The midpoint z0 is set halfway between 0 (WT) and the normalised mean,
+    putting WT in the high-activity tail and most mutants in the low-activity tail.
+    tau=0.5 gives a steep threshold in units of population std.
+
+    Returns a dict suitable for nonlin_name='sigmoid'.
+    """
+    std  = float(np.std(s_raw))  + 1e-8
+    mean = float(np.mean(s_raw))
+    z0   = (mean / std) / 2.0    # negative; WT at z=0 is above midpoint
+    # tau=0.2: steep threshold so sequences near WT stay near the top while
+    # sequences with mutations at critical positions drop sharply to the floor.
+    # Mimics the biophysical reality that a few key-position mutations
+    # completely abolish binding (switch-like, not gradual).
+    return dict(sig_z0=z0, sig_tau=1.0, y_min=0.0, y_max=1.0, _norm_std=std)
+
+
 def soft_threshold(x: np.ndarray, lam: float) -> np.ndarray:
     """Prox operator for L1: argmin_z 0.5||z-x||^2 + lam||z||_1."""
     return np.sign(x) * np.maximum(np.abs(x) - lam, 0.0)
@@ -147,7 +167,7 @@ def init_additive_noWT(rng, wt_onehot, sigma=0.5, l1_w=0.0, bias=0.0):
         non_wt = [n for n in range(4) if n != wt_idx[i]]
         mut_index_map[i] = non_wt
 
-    W_mut = rng.normal(0.0, sigma, size=(L, 3)).astype(np.float32)
+    W_mut = -np.abs(rng.normal(0.0, sigma, size=(L, 3))).astype(np.float32)
     if l1_w > 0:
         W_mut = soft_threshold(W_mut, l1_w)
 
@@ -228,10 +248,10 @@ def init_pairwise_potts_optionA(
 
     J = np.zeros((L, L, 4, 4), dtype=np.float32)
     for (i, j) in edges:
-        M = np.abs(rng.standard_t(df, size=(4, 4))).astype(np.float32) * float(lambda_J)
+        M = -np.abs(rng.standard_t(df, size=(4, 4))).astype(np.float32) * float(lambda_J)
         if p_rescue > 0:
             mask = (rng.random((4, 4)) < p_rescue)
-            M[mask] *= -1.0
+            M[mask] = 0.0
         if wt_rowcol_zero:
             wi, wj = int(wt_idx[i]), int(wt_idx[j])
             M[wi, :] = 0.0
@@ -258,6 +278,49 @@ def pairwise_potts_energy(
     for (i, j) in edges:
         s += J[i, j, x_idx[:, i], x_idx[:, j]]
     return (s + float(b)).reshape(-1, 1)
+
+
+# ---------------------------------------------------------------------------
+# Gaussian pairwise model (negative control, no Potts structure)
+# ---------------------------------------------------------------------------
+
+def init_pairwise_gaussian(
+    rng,
+    wt_onehot: np.ndarray,   # (L, 4)
+    sigma: float = 0.3,
+    wt_rowcol_zero: bool = True,
+):
+    """Sample dense all-pairs pairwise couplings from a Gaussian distribution.
+
+    Unlike the Potts model (init_pairwise_potts_optionA) this uses:
+      - N(0, sigma) weights (both positive and negative)
+      - All L*(L-1)/2 pairs active (no sparsity)
+      - No heavy tails (no t-distribution)
+
+    Because couplings are symmetric around zero their contributions partially
+    cancel across a random library, producing a less skewed energy distribution
+    than the all-negative Potts weights.  Intended as a negative control for
+    the library-size experiment.
+
+    Returns (edges, J) in the same format as init_pairwise_potts_optionA.
+    """
+    wt_onehot = np.asarray(wt_onehot, dtype=np.float32)
+    L = wt_onehot.shape[0]
+    wt_idx = np.argmax(wt_onehot, axis=1).astype(int)
+
+    edges = np.array([(i, j) for i in range(L) for j in range(i + 1, L)], dtype=np.int32)
+
+    J = np.zeros((L, L, 4, 4), dtype=np.float32)
+    for (i, j) in edges:
+        M = -np.abs(rng.normal(0.0, sigma, size=(4, 4))).astype(np.float32)
+        if wt_rowcol_zero:
+            wi, wj = int(wt_idx[i]), int(wt_idx[j])
+            M[wi, :] = 0.0
+            M[:, wj] = 0.0
+            M[wi, wj] = 0.0
+        J[i, j, :, :] = M
+
+    return edges, J
 
 
 # ---------------------------------------------------------------------------
@@ -297,8 +360,17 @@ def apply_global_nonlin(s, nonlin_name, nonlin_kwargs):
             temperature=float(nonlin_kwargs.get("mix_temperature", 1.0)),
             mix_weights=np.asarray(_mw, dtype=float).reshape(-1) if _mw is not None else None,
         )
+
+    elif nonlin_name == "sigmoid":
+        z0   = float(nonlin_kwargs.get("sig_z0",  0.0))
+        tau  = float(nonlin_kwargs.get("sig_tau",  1.0))
+        y_lo = float(nonlin_kwargs.get("y_min",   0.0))
+        y_hi = float(nonlin_kwargs.get("y_max",   1.0))
+        y = y_lo + (y_hi - y_lo) / (1.0 + np.exp(-(s - z0) / tau))
+        return y.reshape(-1, 1)   # sigmoid has its own bounds; skip out_scale/out_bias
+
     else:
-        raise ValueError("nonlin_name must be 'tanh', 'softmax_gate', or 'mix_tanh'")
+        raise ValueError("nonlin_name must be 'tanh', 'softmax_gate', 'mix_tanh', or 'sigmoid'")
 
     return (out_scale * y + out_bias).reshape(-1, 1)
 
@@ -417,11 +489,11 @@ def compute_gt_scores_for_library(
 
     y_add             = s_add.reshape(-1)
     y_addpair         = s_addpair.reshape(-1)
-    # Normalise each energy stream to unit std before the nonlinearity so
-    # that tanh/mix_tanh parameters have a consistent interpretation
-    # regardless of whether the pairwise term inflates the energy scale.
-    s_add_n     = s_add     / (np.std(s_add)     + 1e-8)
-    s_addpair_n = s_addpair / (np.std(s_addpair) + 1e-8)
+    # Z-score each energy stream before the nonlinearity so that mean bias
+    # (e.g. from predominantly positive Potts couplings) doesn't push the
+    # nonlinearity into saturation.
+    s_add_n     = (s_add     - np.mean(s_add))     / (np.std(s_add)     + 1e-8)
+    s_addpair_n = (s_addpair - np.mean(s_addpair)) / (np.std(s_addpair) + 1e-8)
     y_nonlin_add      = apply_global_nonlin(s_add_n,     nonlin_name, nonlin_kwargs).reshape(-1)
     y_nonlin_addpair  = apply_global_nonlin(s_addpair_n, nonlin_name, nonlin_kwargs).reshape(-1)
 
@@ -460,17 +532,44 @@ def compute_gt_scores_for_library_potts(
 
     s_addpair = s_add + s_pair
 
-    y_add             = s_add.reshape(-1)
-    y_addpair         = s_addpair.reshape(-1)
-    s_add_n     = s_add     / (np.std(s_add)     + 1e-8)
-    s_addpair_n = s_addpair / (np.std(s_addpair) + 1e-8)
-    y_nonlin_add      = apply_global_nonlin(s_add_n,     nonlin_name, nonlin_kwargs).reshape(-1)
-    y_nonlin_addpair  = apply_global_nonlin(s_addpair_n, nonlin_name, nonlin_kwargs).reshape(-1)
+    y_add     = s_add.reshape(-1)
+    y_addpair = s_addpair.reshape(-1)
+
+    if nonlin_name == "sigmoid":
+        # Use the reference std stored in nonlin_kwargs (computed on the random/training
+        # library by init_sigmoid_nonlin) so that random and eval libraries are scored
+        # in the same coordinate system.  Recomputing std from the current library
+        # would give a near-zero std for near-WT eval libraries, blowing up z-scores
+        # and saturating the sigmoid.  Both s_add and s_addpair are divided by the
+        # same std_add (not std_addpair), matching make_4_gt_eval_libraries.
+        ref_std = float(nonlin_kwargs.get("_norm_std", float(np.std(s_add)) + 1e-8))
+        s_add_n     = s_add     / ref_std
+        s_addpair_n = s_addpair / ref_std
+        y_nonlin_add     = apply_global_nonlin(s_add_n,     nonlin_name, nonlin_kwargs).reshape(-1)
+        y_nonlin_addpair = apply_global_nonlin(s_addpair_n, nonlin_name, nonlin_kwargs).reshape(-1)
+        # Anchor: WT z=0, subtract sigmoid(0) so WT → 0 and mutations are negative.
+        wt_nl = float(apply_global_nonlin(np.array([[0.0]]), nonlin_name, nonlin_kwargs))
+        y_nonlin_add     -= wt_nl
+        y_nonlin_addpair -= wt_nl
+    else:
+        mean_add     = float(np.mean(s_add))
+        mean_addpair = float(np.mean(s_addpair))
+        std_add     = float(np.std(s_add))     + 1e-8
+        std_addpair = float(np.std(s_addpair)) + 1e-8
+        s_add_n     = (s_add     - mean_add)     / std_add
+        s_addpair_n = (s_addpair - mean_addpair) / std_addpair
+        # Anchor: subtract nonlin output at WT z-score so WT → 0 and all mutations ≤ 0.
+        wt_z_add     = (0.0 - mean_add)     / std_add
+        wt_z_addpair = (0.0 - mean_addpair) / std_addpair
+        wt_nl_add     = float(apply_global_nonlin(np.array([[wt_z_add]]),     nonlin_name, nonlin_kwargs))
+        wt_nl_addpair = float(apply_global_nonlin(np.array([[wt_z_addpair]]), nonlin_name, nonlin_kwargs))
+        y_nonlin_add     = apply_global_nonlin(s_add_n,     nonlin_name, nonlin_kwargs).reshape(-1) - wt_nl_add
+        y_nonlin_addpair = apply_global_nonlin(s_addpair_n, nonlin_name, nonlin_kwargs).reshape(-1) - wt_nl_addpair
 
     return {
-        "additive":               y_add,
-        "additive_pairwise":      y_addpair,
-        "nonlin_additive":        y_nonlin_add,
+        "additive":                 y_add,
+        "additive_pairwise":        y_addpair,
+        "nonlin_additive":          y_nonlin_add,
         "nonlin_additive_pairwise": y_nonlin_addpair,
     }
 
@@ -479,14 +578,13 @@ def compute_gt_scores_for_library_potts(
 # Library uniformisation
 # ---------------------------------------------------------------------------
 
-def uniformize_by_histogram(scores, X=None, n_bins=200, clip_hi=98, seed=42, target_n=None):
+def uniformize_by_histogram(scores, X=None, n_bins=200, clip_lo=1, clip_hi=98, seed=42, target_n=None):
     """Equalise counts per score bin and optionally cap the total output.
 
-    Uses rank-based equal-count binning: sequences are sorted by score and
-    split into n_bins groups of equal size.  This guarantees every bin is
-    non-empty and avoids the np.unique / duplicate-edge collapse that occurs
-    with percentile-based edges when the score distribution is heavily
-    saturated (many sequences at the same float value).
+    Uses score-space equal-width binning: the clipped score range is divided
+    into n_bins equal-width intervals and equal numbers of sequences are sampled
+    from each interval.  This produces a visually flat (uniform) score histogram,
+    making it clearly distinguishable from a right-skewed random training library.
 
     Parameters
     ----------
@@ -494,7 +592,8 @@ def uniformize_by_histogram(scores, X=None, n_bins=200, clip_hi=98, seed=42, tar
     X        : (N, L, A) one-hot sequences, or None.
                When None, returns (scores_uniform, keep_indices) instead of
                (scores_uniform, X_uniform) so callers can reconstruct X cheaply.
-    n_bins   : number of rank-based bins
+    n_bins   : number of equal-width score-space bins
+    clip_lo  : lower percentile clip (removes extreme-low outliers)
     clip_hi  : upper percentile clip (removes extreme-high outliers)
     target_n : if set, cap per_bin so total output ≈ target_n.
 
@@ -512,10 +611,11 @@ def uniformize_by_histogram(scores, X=None, n_bins=200, clip_hi=98, seed=42, tar
     if X is not None:
         X = np.asarray(X)[orig_idx]
 
+    lo = np.nanpercentile(scores, clip_lo)
     hi = np.nanpercentile(scores, clip_hi)
 
     # Work only on sequences within the clip range
-    in_range = scores <= hi
+    in_range = (scores >= lo) & (scores <= hi)
     range_pos = np.where(in_range)[0]           # positions within filtered scores
     scores_r  = scores[range_pos]
     n_r       = len(scores_r)
@@ -525,14 +625,11 @@ def uniformize_by_histogram(scores, X=None, n_bins=200, clip_hi=98, seed=42, tar
 
     n_bins_eff = min(int(n_bins), n_r)
 
-    # Rank-based binning: sort by score, assign equal-count bins by rank.
-    # This is immune to duplicate score values (saturation) — every bin gets
-    # floor(n_r / n_bins_eff) sequences regardless of score distribution shape.
-    sort_order           = np.argsort(scores_r, kind="stable")
-    bin_ids_sorted       = np.floor(np.arange(n_r) * n_bins_eff / n_r).astype(int)
-    bin_ids_sorted       = np.clip(bin_ids_sorted, 0, n_bins_eff - 1)
-    bin_ids              = np.empty(n_r, dtype=int)
-    bin_ids[sort_order]  = bin_ids_sorted
+    # Score-space binning: divide [lo, hi] into n_bins equal-width intervals.
+    # This is what makes the output distribution visually flat — each interval
+    # of equal score width contributes the same number of sequences.
+    edges   = np.linspace(lo, hi, n_bins_eff + 1)
+    bin_ids = np.clip(np.digitize(scores_r, edges) - 1, 0, n_bins_eff - 1)
 
     counts  = np.bincount(bin_ids, minlength=n_bins_eff)
     per_bin = int(counts[counts > 0].min())

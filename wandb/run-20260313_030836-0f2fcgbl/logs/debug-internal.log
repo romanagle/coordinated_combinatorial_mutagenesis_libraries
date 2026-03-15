@@ -1,0 +1,778 @@
+2026-03-13 03:08:37,003 INFO    StreamThr :1380349 [internal.py:wandb_internal():86] W&B internal server running at pid: 1380349, started at: 2026-03-13 03:08:37.002451
+2026-03-13 03:08:37,007 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status
+2026-03-13 03:08:37,011 INFO    WriterThread:1380349 [datastore.py:open_for_write():87] open: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/run-0f2fcgbl.wandb
+2026-03-13 03:08:37,012 DEBUG   SenderThread:1380349 [sender.py:send():388] send: header
+2026-03-13 03:08:37,039 DEBUG   SenderThread:1380349 [sender.py:send():388] send: run
+2026-03-13 03:08:37,366 INFO    SenderThread:1380349 [dir_watcher.py:__init__():211] watching files in: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files
+2026-03-13 03:08:37,366 INFO    SenderThread:1380349 [sender.py:_start_run_threads():1158] run started: 0f2fcgbl with start time 1773385717.000856
+2026-03-13 03:08:37,377 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: run_start
+2026-03-13 03:08:37,385 DEBUG   HandlerThread:1380349 [system_info.py:__init__():26] System info init
+2026-03-13 03:08:37,385 DEBUG   HandlerThread:1380349 [system_info.py:__init__():41] System info init done
+2026-03-13 03:08:37,385 INFO    HandlerThread:1380349 [system_monitor.py:start():194] Starting system monitor
+2026-03-13 03:08:37,386 INFO    SystemMonitor:1380349 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2026-03-13 03:08:37,386 INFO    HandlerThread:1380349 [system_monitor.py:probe():214] Collecting system info
+2026-03-13 03:08:37,387 INFO    SystemMonitor:1380349 [interfaces.py:start():188] Started cpu monitoring
+2026-03-13 03:08:37,387 INFO    SystemMonitor:1380349 [interfaces.py:start():188] Started disk monitoring
+2026-03-13 03:08:37,389 INFO    SystemMonitor:1380349 [interfaces.py:start():188] Started gpu monitoring
+2026-03-13 03:08:37,390 INFO    SystemMonitor:1380349 [interfaces.py:start():188] Started memory monitoring
+2026-03-13 03:08:37,391 INFO    SystemMonitor:1380349 [interfaces.py:start():188] Started network monitoring
+2026-03-13 03:08:37,459 DEBUG   HandlerThread:1380349 [system_info.py:probe():152] Probing system
+2026-03-13 03:08:37,460 DEBUG   HandlerThread:1380349 [system_info.py:_probe_git():137] Probing git
+2026-03-13 03:08:37,490 DEBUG   HandlerThread:1380349 [system_info.py:_probe_git():145] Probing git done
+2026-03-13 03:08:37,490 DEBUG   HandlerThread:1380349 [system_info.py:probe():200] Probing system done
+2026-03-13 03:08:37,490 DEBUG   HandlerThread:1380349 [system_monitor.py:probe():223] {'os': 'Linux-5.15.0-119-generic-x86_64-with-debian-bullseye-sid', 'python': '3.7.12', 'heartbeatAt': '2026-03-13T07:08:37.459836', 'startedAt': '2026-03-13T07:08:36.993287', 'docker': None, 'cuda': None, 'args': ('--seq', 'AAAAAAACCCCCAAAAAAUCGGCUGGACCGGGAAAAAAAAAAAAAAACCCCCAAAAAAUCGGCUGGACCGGGAACCCCCAAAAAAUCGGCUGGACCGGGAA', '--lib_size', '5000', '--eval_pool', '200000', '--epochs', '200', '--mut_rate_int=14', '--potts_df=10', '--potts_lambda_J=2.733886761149564', '--potts_p_edge=0.83400474268233', '--potts_p_rescue=0.1799226015419444', '--seed=0', '--seq_length=25'), 'state': 'running', 'program': 'scripts/wandb_sweep.py', 'codePathLocal': 'scripts/wandb_sweep.py', 'codePath': 'scripts/wandb_sweep.py', 'git': {'remote': 'git@github.com:romanagle/coordinated_combinatorial_mutagenesis_libraries.git', 'commit': '34fdd3c13be9bc9a24d9469b94287e2df4b30105'}, 'email': 'romanagle@berkeley.edu', 'root': '/home/nagle/final_version', 'host': 'citra', 'username': 'nagle', 'executable': '/home/nagle/miniconda3/envs/squid/bin/python', 'cpu_count': 32, 'cpu_count_logical': 32, 'cpu_freq': {'current': 1532.35834375, 'min': 1500.0, 'max': 3000.0}, 'cpu_freq_per_core': [{'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1803.568, 'min': 1500.0, 'max': 3000.0}, {'current': 2232.007, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}], 'disk': {'/': {'total': 7391.56880569458, 'used': 4867.953369140625}}, 'gpu': 'NVIDIA RTX A4000', 'gpu_count': 8, 'gpu_devices': [{'name': 'NVIDIA RTX A4000', 'memory_total': 16900227072}, {'name': 'NVIDIA RTX A4000', 'memory_total': 16900227072}, {'name': 'NVIDIA RTX A4000', 'memory_total': 16900227072}, {'name': 'NVIDIA RTX A4000', 'memory_total': 16900227072}, {'name': 'NVIDIA RTX A4000', 'memory_total': 16900227072}, {'name': 'NVIDIA RTX A4000', 'memory_total': 16900227072}, {'name': 'NVIDIA RTX A4000', 'memory_total': 16900227072}, {'name': 'NVIDIA RTX A4000', 'memory_total': 16900227072}], 'memory': {'total': 503.748348236084}}
+2026-03-13 03:08:37,490 INFO    HandlerThread:1380349 [system_monitor.py:probe():224] Finished collecting system info
+2026-03-13 03:08:37,490 INFO    HandlerThread:1380349 [system_monitor.py:probe():227] Publishing system info
+2026-03-13 03:08:37,491 DEBUG   HandlerThread:1380349 [system_info.py:_save_conda():210] Saving list of conda packages installed into the current environment
+2026-03-13 03:08:38,369 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_created():271] file/dir created: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/conda-environment.yaml
+2026-03-13 03:08:40,220 DEBUG   HandlerThread:1380349 [system_info.py:_save_conda():224] Saving conda packages done
+2026-03-13 03:08:40,221 INFO    HandlerThread:1380349 [system_monitor.py:probe():229] Finished publishing system info
+2026-03-13 03:08:40,231 DEBUG   SenderThread:1380349 [sender.py:send():388] send: files
+2026-03-13 03:08:40,231 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-metadata.json with policy now
+2026-03-13 03:08:40,367 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/conda-environment.yaml
+2026-03-13 03:08:40,369 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_created():271] file/dir created: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-metadata.json
+2026-03-13 03:08:40,410 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: python_packages
+2026-03-13 03:08:40,411 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: python_packages
+2026-03-13 03:08:40,412 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:08:40,412 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:08:40,416 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:08:40,467 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:08:40,469 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:08:40,470 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:08:40,471 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:08:40,472 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:08:40,538 INFO    wandb-upload_0:1380349 [upload_job.py:push():130] Uploaded file /tmp/tmpr_ez3t9gwandb/i1tzjwro-wandb-metadata.json
+2026-03-13 03:08:40,559 DEBUG   SenderThread:1380349 [sender.py:send():388] send: telemetry
+2026-03-13 03:08:40,560 DEBUG   SenderThread:1380349 [sender.py:send():388] send: config
+2026-03-13 03:08:40,562 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:08:40,562 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:08:40,565 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:08:40,566 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:08:40,566 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:08:40,566 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:08:40,566 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:08:40,566 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:08:40,570 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:08:40,570 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:08:40,571 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:08:40,571 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:08:40,571 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:08:40,571 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:08:40,571 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:08:41,368 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_created():271] file/dir created: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/requirements.txt
+2026-03-13 03:08:41,368 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_created():271] file/dir created: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:08:41,368 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_created():271] file/dir created: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:08:42,335 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:08:43,369 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:08:47,756 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:08:49,371 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:08:50,412 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:08:51,371 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:08:52,782 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:08:53,372 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:08:55,373 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:08:55,411 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:08:55,412 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:08:57,374 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:08:57,878 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:08:59,374 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:00,413 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:09:01,375 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:02,982 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:09:03,376 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:05,376 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:07,377 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:08,091 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:09:08,377 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/config.yaml
+2026-03-13 03:09:09,378 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:10,411 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:09:10,412 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:09:10,418 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:09:11,379 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:13,352 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:09:13,379 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:15,380 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:16,759 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:09:16,761 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:09:16,761 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:09:16,762 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:09:17,381 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:09:17,381 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:18,431 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:09:19,381 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:20,413 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:09:21,382 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:23,383 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:23,572 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:09:25,384 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:25,411 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:09:25,412 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:09:27,385 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:28,599 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:09:29,386 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:30,413 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:09:31,386 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:33,387 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:33,653 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:09:35,388 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:37,388 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:37,392 DEBUG   SystemMonitor:1380349 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2026-03-13 03:09:37,406 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:09:38,711 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:09:39,389 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:40,412 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:09:40,413 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:09:40,420 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:09:41,390 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:43,391 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:43,770 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:09:45,391 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:47,392 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:48,894 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:09:49,393 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:50,414 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:09:50,551 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:09:50,553 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:09:50,553 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:09:50,554 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:09:51,393 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:09:51,394 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:53,394 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:54,038 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:09:55,395 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:55,412 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:09:55,413 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:09:57,396 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:09:59,136 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:09:59,396 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:00,414 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:10:01,397 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:03,398 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:04,342 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:10:05,399 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:07,401 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:07,414 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:10:09,402 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:09,495 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:10:10,412 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:10:10,414 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:10:10,418 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:10:11,404 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:13,404 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:14,696 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:10:15,404 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:17,405 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:19,406 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:19,928 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:10:20,414 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:10:21,407 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:23,407 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:25,103 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:10:25,408 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:25,412 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:10:25,413 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:10:27,409 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:29,409 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:30,243 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:10:30,415 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:10:31,410 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:33,411 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:35,412 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:35,424 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:10:37,405 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:10:37,412 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:39,413 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:40,413 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:10:40,413 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:10:40,418 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:10:40,596 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:10:41,419 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:43,420 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:45,420 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:45,772 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:10:47,421 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:47,558 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:10:47,560 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:10:47,561 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:10:47,561 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:10:48,422 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:10:49,422 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:50,415 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:10:50,982 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:10:51,423 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:53,423 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:55,413 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:10:55,414 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:10:55,424 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:56,192 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:10:57,425 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:10:59,426 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:00,415 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:11:01,350 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:11:01,426 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:02,972 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:11:02,974 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:11:02,974 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:11:02,975 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:11:03,427 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:11:03,427 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:05,428 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:06,378 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:11:07,407 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:11:07,429 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:09,429 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:10,414 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:11:10,414 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:11:10,418 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:11:11,430 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:11,443 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:11:13,431 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:15,432 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:16,497 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:11:17,432 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:19,433 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:20,416 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:11:21,434 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:21,600 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:11:22,323 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:11:22,325 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:11:22,326 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:11:22,326 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:11:22,434 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:11:23,434 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:25,414 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:11:25,414 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:11:25,435 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:26,746 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:11:27,436 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:29,437 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:30,417 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:11:31,437 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:31,757 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:11:33,438 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:35,439 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:36,857 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:11:37,411 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:11:37,439 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:39,440 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:40,414 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:11:40,415 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:11:40,419 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:11:41,441 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:42,012 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:11:43,442 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:45,442 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:47,059 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:11:47,443 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:49,444 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:50,417 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:11:51,444 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:52,170 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:11:53,445 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:55,055 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:11:55,057 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:11:55,057 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:11:55,058 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:11:55,414 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:11:55,414 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:11:55,446 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:11:55,446 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:57,281 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:11:57,447 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:11:59,447 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:00,417 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:12:01,448 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:02,439 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:12:03,449 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:05,450 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:07,414 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:12:07,450 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:07,619 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:12:09,451 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:10,414 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:12:10,414 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:12:10,418 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:12:11,452 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:12,649 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:12:13,453 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:15,454 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:17,454 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:17,797 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:12:19,455 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:20,418 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:12:21,456 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:23,030 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:12:23,457 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:25,414 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:12:25,415 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:12:25,457 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:27,458 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:28,261 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:12:29,459 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:30,418 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:12:31,460 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:33,460 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:33,517 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:12:35,461 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:37,418 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:12:37,462 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:38,548 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:12:39,463 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:40,414 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:12:40,415 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:12:40,419 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:12:41,463 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:43,464 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:43,549 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:12:45,465 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:47,465 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:48,560 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:12:49,466 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:50,419 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:12:51,467 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:52,324 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:12:52,325 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:12:52,326 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:12:52,327 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:12:52,467 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:12:53,468 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:53,643 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:12:55,414 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:12:55,415 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:12:55,468 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:57,469 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:12:58,783 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:12:59,470 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:00,419 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:13:01,471 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:03,471 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:03,991 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:13:05,472 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:07,421 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:13:07,473 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:09,220 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:13:09,473 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:10,415 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:13:10,415 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:13:10,419 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:13:11,474 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:12,496 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:13:12,498 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:13:12,498 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:13:12,499 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:13:13,475 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:13:13,475 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:14,319 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:13:15,476 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:17,477 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:19,460 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:13:19,477 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:20,420 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:13:21,478 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:23,479 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:24,502 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:13:25,415 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:13:25,416 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:13:25,480 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:27,419 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:13:27,422 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:13:27,422 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:13:27,423 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:13:27,480 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:13:27,481 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:29,481 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:29,643 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:13:30,420 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:13:31,482 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:33,482 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:34,692 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:13:35,483 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:37,424 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:13:37,484 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:39,484 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:39,699 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:13:40,415 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:13:40,416 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:13:40,420 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:13:41,485 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:43,486 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:44,745 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:13:45,487 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:47,487 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:49,488 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:49,833 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:13:50,420 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:13:50,751 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:13:50,753 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:13:50,753 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:13:50,754 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:13:51,489 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:13:51,489 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:53,489 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:54,887 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:13:55,415 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:13:55,415 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:13:55,490 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:57,491 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:13:59,492 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:00,163 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:14:00,420 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:14:01,492 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:03,493 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:05,409 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:14:05,494 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:07,428 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:14:07,495 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:09,495 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:10,415 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:14:10,416 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:14:10,420 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:14:10,514 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:14:11,496 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:13,497 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:15,497 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:15,623 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:14:17,498 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:19,499 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:20,420 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:14:20,855 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:14:21,500 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:23,501 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:25,415 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:14:25,416 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:14:25,501 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:25,990 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:14:27,502 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:29,503 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:30,420 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:14:31,000 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:14:31,504 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:33,504 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:35,505 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:36,015 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:14:37,432 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:14:37,506 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:39,506 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:40,416 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:14:40,416 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:14:40,420 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:14:41,066 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:14:41,507 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:43,508 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:45,509 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:46,314 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:14:47,509 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:48,127 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:14:48,130 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:14:48,130 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:14:48,131 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:14:48,510 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:14:49,510 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:50,421 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:14:51,544 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:14:53,512 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:55,416 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:14:55,416 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:14:55,512 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:56,671 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:14:57,513 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:14:59,514 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:00,421 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:15:01,514 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:01,864 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:15:03,515 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:05,516 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:07,084 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:15:07,441 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:15:07,516 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:09,517 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:10,416 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:15:10,417 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:15:10,421 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:15:11,518 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:12,336 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:15:13,518 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:15,519 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:16,521 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:15:16,522 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:15:16,523 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:15:16,524 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:15:17,520 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:15:17,520 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:17,545 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:15:19,520 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:20,422 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:15:21,521 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:21,557 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:15:21,559 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:15:21,559 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:15:21,560 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:15:22,522 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:15:22,676 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:15:23,522 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:25,417 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:15:25,418 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:15:25,523 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:26,690 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:15:26,692 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:15:26,692 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:15:26,693 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:15:27,524 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:15:27,524 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:27,996 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:15:29,524 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:30,422 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:15:31,525 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:33,115 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:15:33,526 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:35,528 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:37,442 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:15:37,529 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:38,187 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:15:39,529 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:40,417 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:15:40,417 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:15:40,421 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:15:41,530 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:43,306 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:15:43,531 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:45,532 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:47,532 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:48,442 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:15:49,533 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:50,422 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:15:51,534 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:53,506 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:15:53,535 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:55,417 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:15:55,417 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:15:55,535 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:57,536 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:15:58,634 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:15:59,537 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:00,422 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:16:01,537 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:03,538 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:03,777 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:16:05,539 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:07,442 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:16:07,540 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:08,919 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:16:09,540 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:10,417 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:16:10,417 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:16:10,422 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:16:11,541 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:13,542 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:14,083 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:16:15,543 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:17,543 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:19,213 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:16:19,544 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:20,423 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:16:21,545 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:22,615 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:16:22,616 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:16:22,617 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:16:22,617 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:16:23,545 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:16:23,546 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:24,934 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:16:25,417 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:16:25,417 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:16:25,546 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:27,547 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:29,548 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:30,120 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:16:30,423 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:16:31,548 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:33,549 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:35,364 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:16:35,550 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:37,446 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:16:37,550 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:39,551 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:40,417 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:16:40,418 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:16:40,423 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:16:40,552 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:16:41,553 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:43,554 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:45,554 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:45,774 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:16:47,555 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:49,556 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:50,424 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:16:50,966 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:16:51,557 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:53,557 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:55,417 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:16:55,418 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:16:55,558 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:55,997 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:16:57,559 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:16:59,560 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:00,424 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:17:01,140 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:17:01,560 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:03,561 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:05,562 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:06,309 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:17:07,449 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:17:07,562 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:09,563 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:10,418 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: stop_status
+2026-03-13 03:17:10,419 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: stop_status
+2026-03-13 03:17:10,424 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:17:11,316 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:17:11,564 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:13,564 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:15,565 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:16,538 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:17:17,566 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:19,566 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:20,424 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:17:21,549 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:17:21,567 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:23,474 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:17:23,475 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: partial_history
+2026-03-13 03:17:23,477 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:17:23,478 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:17:23,479 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:17:23,480 DEBUG   SenderThread:1380349 [sender.py:send():388] send: history
+2026-03-13 03:17:23,480 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: summary_record
+2026-03-13 03:17:23,480 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:17:23,481 DEBUG   SenderThread:1380349 [sender.py:send():388] send: telemetry
+2026-03-13 03:17:23,481 DEBUG   SenderThread:1380349 [sender.py:send():388] send: exit
+2026-03-13 03:17:23,481 INFO    SenderThread:1380349 [sender.py:send_exit():575] handling exit code: 0
+2026-03-13 03:17:23,482 INFO    SenderThread:1380349 [sender.py:send_exit():577] handling runtime: 526
+2026-03-13 03:17:23,482 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:17:23,483 INFO    SenderThread:1380349 [sender.py:send_exit():583] send defer
+2026-03-13 03:17:23,483 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: defer
+2026-03-13 03:17:23,483 INFO    HandlerThread:1380349 [handler.py:handle_request_defer():183] handle defer: 0
+2026-03-13 03:17:23,485 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: defer
+2026-03-13 03:17:23,485 INFO    SenderThread:1380349 [sender.py:send_request_defer():599] handle sender defer: 0
+2026-03-13 03:17:23,485 INFO    SenderThread:1380349 [sender.py:transition_state():603] send defer: 1
+2026-03-13 03:17:23,485 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: defer
+2026-03-13 03:17:23,485 INFO    HandlerThread:1380349 [handler.py:handle_request_defer():183] handle defer: 1
+2026-03-13 03:17:23,486 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: defer
+2026-03-13 03:17:23,486 INFO    SenderThread:1380349 [sender.py:send_request_defer():599] handle sender defer: 1
+2026-03-13 03:17:23,486 INFO    SenderThread:1380349 [sender.py:transition_state():603] send defer: 2
+2026-03-13 03:17:23,486 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: defer
+2026-03-13 03:17:23,486 INFO    HandlerThread:1380349 [handler.py:handle_request_defer():183] handle defer: 2
+2026-03-13 03:17:23,486 INFO    HandlerThread:1380349 [system_monitor.py:finish():203] Stopping system monitor
+2026-03-13 03:17:23,487 DEBUG   SystemMonitor:1380349 [system_monitor.py:_start():179] Finished system metrics aggregation loop
+2026-03-13 03:17:23,487 DEBUG   SystemMonitor:1380349 [system_monitor.py:_start():183] Publishing last batch of metrics
+2026-03-13 03:17:23,489 INFO    HandlerThread:1380349 [interfaces.py:finish():200] Joined cpu monitor
+2026-03-13 03:17:23,489 INFO    HandlerThread:1380349 [interfaces.py:finish():200] Joined disk monitor
+2026-03-13 03:17:23,568 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:17:23,569 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:24,132 INFO    HandlerThread:1380349 [interfaces.py:finish():200] Joined gpu monitor
+2026-03-13 03:17:24,132 INFO    HandlerThread:1380349 [interfaces.py:finish():200] Joined memory monitor
+2026-03-13 03:17:24,132 INFO    HandlerThread:1380349 [interfaces.py:finish():200] Joined network monitor
+2026-03-13 03:17:24,133 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: defer
+2026-03-13 03:17:24,134 INFO    SenderThread:1380349 [sender.py:send_request_defer():599] handle sender defer: 2
+2026-03-13 03:17:24,134 INFO    SenderThread:1380349 [sender.py:transition_state():603] send defer: 3
+2026-03-13 03:17:24,134 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: defer
+2026-03-13 03:17:24,134 INFO    HandlerThread:1380349 [handler.py:handle_request_defer():183] handle defer: 3
+2026-03-13 03:17:24,134 DEBUG   SenderThread:1380349 [sender.py:send():388] send: stats
+2026-03-13 03:17:24,135 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: defer
+2026-03-13 03:17:24,135 INFO    SenderThread:1380349 [sender.py:send_request_defer():599] handle sender defer: 3
+2026-03-13 03:17:24,135 INFO    SenderThread:1380349 [sender.py:transition_state():603] send defer: 4
+2026-03-13 03:17:24,135 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: defer
+2026-03-13 03:17:24,135 INFO    HandlerThread:1380349 [handler.py:handle_request_defer():183] handle defer: 4
+2026-03-13 03:17:24,136 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: defer
+2026-03-13 03:17:24,136 INFO    SenderThread:1380349 [sender.py:send_request_defer():599] handle sender defer: 4
+2026-03-13 03:17:24,136 INFO    SenderThread:1380349 [sender.py:transition_state():603] send defer: 5
+2026-03-13 03:17:24,136 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: defer
+2026-03-13 03:17:24,136 INFO    HandlerThread:1380349 [handler.py:handle_request_defer():183] handle defer: 5
+2026-03-13 03:17:24,138 DEBUG   SenderThread:1380349 [sender.py:send():388] send: summary
+2026-03-13 03:17:24,138 INFO    SenderThread:1380349 [sender.py:_save_file():1421] saving file wandb-summary.json with policy end
+2026-03-13 03:17:24,138 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: defer
+2026-03-13 03:17:24,138 INFO    SenderThread:1380349 [sender.py:send_request_defer():599] handle sender defer: 5
+2026-03-13 03:17:24,138 INFO    SenderThread:1380349 [sender.py:transition_state():603] send defer: 6
+2026-03-13 03:17:24,139 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: defer
+2026-03-13 03:17:24,139 INFO    HandlerThread:1380349 [handler.py:handle_request_defer():183] handle defer: 6
+2026-03-13 03:17:24,139 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: defer
+2026-03-13 03:17:24,139 INFO    SenderThread:1380349 [sender.py:send_request_defer():599] handle sender defer: 6
+2026-03-13 03:17:24,144 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: status_report
+2026-03-13 03:17:24,291 INFO    SenderThread:1380349 [sender.py:transition_state():603] send defer: 7
+2026-03-13 03:17:24,291 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: defer
+2026-03-13 03:17:24,291 INFO    HandlerThread:1380349 [handler.py:handle_request_defer():183] handle defer: 7
+2026-03-13 03:17:24,292 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: defer
+2026-03-13 03:17:24,292 INFO    SenderThread:1380349 [sender.py:send_request_defer():599] handle sender defer: 7
+2026-03-13 03:17:24,476 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: poll_exit
+2026-03-13 03:17:24,569 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/config.yaml
+2026-03-13 03:17:24,569 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:17:25,569 INFO    Thread-12 :1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:27,155 INFO    SenderThread:1380349 [sender.py:transition_state():603] send defer: 8
+2026-03-13 03:17:27,155 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: poll_exit
+2026-03-13 03:17:27,156 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: defer
+2026-03-13 03:17:27,156 INFO    HandlerThread:1380349 [handler.py:handle_request_defer():183] handle defer: 8
+2026-03-13 03:17:27,157 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: defer
+2026-03-13 03:17:27,157 INFO    SenderThread:1380349 [sender.py:send_request_defer():599] handle sender defer: 8
+2026-03-13 03:17:27,157 INFO    SenderThread:1380349 [sender.py:transition_state():603] send defer: 9
+2026-03-13 03:17:27,157 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: defer
+2026-03-13 03:17:27,157 INFO    HandlerThread:1380349 [handler.py:handle_request_defer():183] handle defer: 9
+2026-03-13 03:17:27,158 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: defer
+2026-03-13 03:17:27,158 INFO    SenderThread:1380349 [sender.py:send_request_defer():599] handle sender defer: 9
+2026-03-13 03:17:27,158 INFO    SenderThread:1380349 [dir_watcher.py:finish():358] shutting down directory watcher
+2026-03-13 03:17:27,477 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: poll_exit
+2026-03-13 03:17:27,571 INFO    SenderThread:1380349 [dir_watcher.py:_on_file_modified():288] file/dir modified: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:27,571 INFO    SenderThread:1380349 [dir_watcher.py:finish():388] scan: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files
+2026-03-13 03:17:27,571 INFO    SenderThread:1380349 [dir_watcher.py:finish():402] scan save: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/requirements.txt requirements.txt
+2026-03-13 03:17:27,571 INFO    SenderThread:1380349 [dir_watcher.py:finish():402] scan save: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log output.log
+2026-03-13 03:17:27,572 INFO    SenderThread:1380349 [dir_watcher.py:finish():402] scan save: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json wandb-summary.json
+2026-03-13 03:17:27,582 INFO    SenderThread:1380349 [dir_watcher.py:finish():402] scan save: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/config.yaml config.yaml
+2026-03-13 03:17:27,582 INFO    SenderThread:1380349 [dir_watcher.py:finish():402] scan save: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/conda-environment.yaml conda-environment.yaml
+2026-03-13 03:17:27,583 INFO    SenderThread:1380349 [dir_watcher.py:finish():402] scan save: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-metadata.json wandb-metadata.json
+2026-03-13 03:17:27,583 INFO    SenderThread:1380349 [sender.py:transition_state():603] send defer: 10
+2026-03-13 03:17:27,583 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: poll_exit
+2026-03-13 03:17:27,583 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: defer
+2026-03-13 03:17:27,584 INFO    HandlerThread:1380349 [handler.py:handle_request_defer():183] handle defer: 10
+2026-03-13 03:17:27,585 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: defer
+2026-03-13 03:17:27,585 INFO    SenderThread:1380349 [sender.py:send_request_defer():599] handle sender defer: 10
+2026-03-13 03:17:27,585 INFO    SenderThread:1380349 [file_pusher.py:finish():169] shutting down file pusher
+2026-03-13 03:17:27,854 INFO    wandb-upload_1:1380349 [upload_job.py:push():130] Uploaded file /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/requirements.txt
+2026-03-13 03:17:27,879 INFO    wandb-upload_4:1380349 [upload_job.py:push():130] Uploaded file /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/config.yaml
+2026-03-13 03:17:27,900 INFO    wandb-upload_2:1380349 [upload_job.py:push():130] Uploaded file /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/output.log
+2026-03-13 03:17:27,901 INFO    wandb-upload_5:1380349 [upload_job.py:push():130] Uploaded file /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/conda-environment.yaml
+2026-03-13 03:17:27,907 INFO    wandb-upload_0:1380349 [upload_job.py:push():130] Uploaded file /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/files/wandb-summary.json
+2026-03-13 03:17:28,108 INFO    Thread-11 :1380349 [sender.py:transition_state():603] send defer: 11
+2026-03-13 03:17:28,109 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: defer
+2026-03-13 03:17:28,109 INFO    HandlerThread:1380349 [handler.py:handle_request_defer():183] handle defer: 11
+2026-03-13 03:17:28,109 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: defer
+2026-03-13 03:17:28,110 INFO    SenderThread:1380349 [sender.py:send_request_defer():599] handle sender defer: 11
+2026-03-13 03:17:28,110 INFO    SenderThread:1380349 [file_pusher.py:join():175] waiting for file pusher
+2026-03-13 03:17:28,110 INFO    SenderThread:1380349 [sender.py:transition_state():603] send defer: 12
+2026-03-13 03:17:28,110 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: defer
+2026-03-13 03:17:28,111 INFO    HandlerThread:1380349 [handler.py:handle_request_defer():183] handle defer: 12
+2026-03-13 03:17:28,111 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: defer
+2026-03-13 03:17:28,111 INFO    SenderThread:1380349 [sender.py:send_request_defer():599] handle sender defer: 12
+2026-03-13 03:17:28,111 INFO    SenderThread:1380349 [file_stream.py:finish():601] file stream finish called
+2026-03-13 03:17:28,477 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: poll_exit
+2026-03-13 03:17:28,924 INFO    SenderThread:1380349 [file_stream.py:finish():605] file stream finish is done
+2026-03-13 03:17:28,924 INFO    SenderThread:1380349 [sender.py:transition_state():603] send defer: 13
+2026-03-13 03:17:28,924 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: poll_exit
+2026-03-13 03:17:28,925 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: defer
+2026-03-13 03:17:28,925 INFO    HandlerThread:1380349 [handler.py:handle_request_defer():183] handle defer: 13
+2026-03-13 03:17:28,925 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: defer
+2026-03-13 03:17:28,926 INFO    SenderThread:1380349 [sender.py:send_request_defer():599] handle sender defer: 13
+2026-03-13 03:17:28,926 INFO    SenderThread:1380349 [sender.py:transition_state():603] send defer: 14
+2026-03-13 03:17:28,926 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: defer
+2026-03-13 03:17:28,927 INFO    HandlerThread:1380349 [handler.py:handle_request_defer():183] handle defer: 14
+2026-03-13 03:17:28,927 DEBUG   SenderThread:1380349 [sender.py:send():388] send: final
+2026-03-13 03:17:28,927 DEBUG   SenderThread:1380349 [sender.py:send():388] send: footer
+2026-03-13 03:17:28,927 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: defer
+2026-03-13 03:17:28,927 INFO    SenderThread:1380349 [sender.py:send_request_defer():599] handle sender defer: 14
+2026-03-13 03:17:28,929 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: poll_exit
+2026-03-13 03:17:28,929 DEBUG   SenderThread:1380349 [sender.py:send_request():415] send_request: poll_exit
+2026-03-13 03:17:28,931 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: internal_messages
+2026-03-13 03:17:28,932 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: get_summary
+2026-03-13 03:17:28,934 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: sampled_history
+2026-03-13 03:17:28,937 DEBUG   HandlerThread:1380349 [handler.py:handle_request():159] handle_request: shutdown
+2026-03-13 03:17:28,937 INFO    HandlerThread:1380349 [handler.py:finish():873] shutting down handler
+2026-03-13 03:17:29,930 INFO    WriterThread:1380349 [datastore.py:close():296] close: /home/nagle/final_version/wandb/run-20260313_030836-0f2fcgbl/run-0f2fcgbl.wandb
+2026-03-13 03:17:29,930 INFO    SenderThread:1380349 [sender.py:finish():1600] shutting down sender
+2026-03-13 03:17:29,930 INFO    SenderThread:1380349 [file_pusher.py:finish():169] shutting down file pusher
+2026-03-13 03:17:29,930 INFO    SenderThread:1380349 [file_pusher.py:join():175] waiting for file pusher

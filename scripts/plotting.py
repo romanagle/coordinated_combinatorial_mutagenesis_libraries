@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.patches import Rectangle
 import seaborn as sns
-from scipy.stats import spearmanr, gaussian_kde
+from scipy.stats import spearmanr, pearsonr, gaussian_kde
 
 from stats_utils import (
     _finite_1d, _flatten_runs, _flatten_list_of_arrays, _finite_flat,
@@ -22,6 +22,7 @@ from ground_truth import (
     init_additive_noWT, init_pairwise_adjacent_noWT, init_pairwise_potts_optionA,
     init_tanh_nonlin,
     init_mix_tanh_nonlin,
+    init_sigmoid_nonlin,
 )
 from seq_utils import rna_to_one_hot
 
@@ -55,6 +56,132 @@ def plot_y_vs_yhat(model, mave_df, save_dir=None):
         plt.savefig(os.path.join(save_dir, 'mavenn_measure_yhat.png'), facecolor='w', dpi=200)
         plt.close()
     return fig, yhat_test, y_test, rho
+
+
+_GT_LABELS = {
+    "additive":                    "Additive GT",
+    "additive_pairwise":           "Add+Pair GT",
+    "nonlin_additive":             "Nonlin Add GT",
+    "nonlin_additive_pairwise":    "Nonlin Add+Pair GT",
+}
+_CFG_LABELS = {
+    "additive":     "Additive",
+    "additive_GE":  "Additive GE",
+    "pairwise":     "Pairwise",
+    "pairwise_GE":  "Pairwise GE",
+}
+_NUCS = np.array(list("ACGU"))
+
+
+def _onehot_to_str_array(X_onehot):
+    """Convert (N, L, 4) one-hot array to array of sequence strings."""
+    return np.array(
+        ["".join(_NUCS[np.argmax(x, axis=1)]) for x in X_onehot],
+        dtype=object,
+    )
+
+
+def plot_16_y_vs_yhat_grid(grid_results, gt_keys, cfg_names, out_path, iteration=0):
+    """4×4 grid of y vs ŷ scatter plots (rows=GT type, cols=surrogate model).
+
+    Each panel overlays two point clouds:
+      - blue  : random MAVE test split
+      - orange: uniform eval library
+
+    Parameters
+    ----------
+    grid_results : dict  {gt_key: {cfg_name: {"model", "test_df", "X_eval", "y_eval"}}}
+    gt_keys      : ordered list of GT key strings (rows)
+    cfg_names    : ordered list of surrogate config names (cols)
+    out_path     : output PNG path
+    iteration    : displayed in suptitle
+    """
+    n_rows, n_cols = len(gt_keys), len(cfg_names)
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(4.2 * n_cols, 4.0 * n_rows))
+
+    for r, gt_key in enumerate(gt_keys):
+        row_lo, row_hi = np.inf, -np.inf   # shared data range across all cols in this row
+
+        for c, cfg_name in enumerate(cfg_names):
+            ax = axes[r, c]
+
+            entry = grid_results.get(gt_key, {}).get(cfg_name)
+            if entry is None:
+                ax.text(0.5, 0.5, "N/A", ha="center", va="center", transform=ax.transAxes)
+                ax.set_title(f"{_CFG_LABELS.get(cfg_name, cfg_name)}\n{_GT_LABELS.get(gt_key, gt_key)}", fontsize=7)
+                continue
+
+            model   = entry["model"]
+            test_df = entry["test_df"]
+            X_eval  = entry["X_eval"]   # (N, L, 4) one-hot
+            y_eval  = entry["y_eval"].ravel()
+
+            # ── Random test-set predictions ──────────────────────────────
+            X_rand   = np.asarray(test_df["x"])
+            y_rand   = np.asarray(test_df["y"], dtype=float).ravel()
+            yhat_rand = np.asarray(model.x_to_yhat(X_rand), dtype=float).ravel()
+
+            # ── Eval library predictions ──────────────────────────────────
+            X_eval_str = _onehot_to_str_array(X_eval)
+            yhat_eval  = np.asarray(model.x_to_yhat(X_eval_str), dtype=float).ravel()
+
+            # ── Spearman ρ and R² ─────────────────────────────────────────
+            m_r = np.isfinite(y_rand)  & np.isfinite(yhat_rand)
+            m_e = np.isfinite(y_eval)  & np.isfinite(yhat_eval)
+
+            rho_r = spearmanr(yhat_rand[m_r], y_rand[m_r])[0] if m_r.sum() >= 3 else np.nan
+            rho_e = spearmanr(yhat_eval[m_e], y_eval[m_e])[0] if m_e.sum() >= 3 else np.nan
+            r_r   = pearsonr(yhat_rand[m_r], y_rand[m_r])[0] if m_r.sum() >= 3 else np.nan
+            r_e   = pearsonr(yhat_eval[m_e], y_eval[m_e])[0] if m_e.sum() >= 3 else np.nan
+            r2_r  = r_r ** 2 if np.isfinite(r_r) else np.nan
+            r2_e  = r_e ** 2 if np.isfinite(r_e) else np.nan
+
+            # ── Track row-wide data range ─────────────────────────────────
+            all_vals = np.concatenate([yhat_rand[m_r], yhat_eval[m_e],
+                                       y_rand[m_r],    y_eval[m_e]])
+            if all_vals.size > 0:
+                row_lo = min(row_lo, float(all_vals.min()))
+                row_hi = max(row_hi, float(all_vals.max()))
+
+            # ── Scatter ───────────────────────────────────────────────────
+            ax.scatter(yhat_rand, y_rand, s=1, alpha=0.08, color="C0",
+                       label=f"random   ρ={rho_r:.2f}  r={r_r:.2f}  R²={r2_r:.2f}", rasterized=True)
+            ax.scatter(yhat_eval, y_eval, s=1, alpha=0.08, color="C1",
+                       label=f"eval      ρ={rho_e:.2f}  r={r_e:.2f}  R²={r2_e:.2f}", rasterized=True)
+
+            # ── Labels ────────────────────────────────────────────────────
+            ax.set_xlabel("ŷ", fontsize=8)
+            ax.set_ylabel("y", fontsize=8)
+            ax.tick_params(labelsize=6)
+            ax.set_title(
+                f"{_CFG_LABELS.get(cfg_name, cfg_name)} / {_GT_LABELS.get(gt_key, gt_key)}",
+                fontsize=7.5,
+            )
+
+            # Legend with larger markers so the colour is visible
+            handles, labels = ax.get_legend_handles_labels()
+            ax.legend(handles, labels, markerscale=6, fontsize=6,
+                      loc="upper left", framealpha=0.6)
+
+        # ── Apply shared axis limits across the row, then draw diagonal ──
+        if np.isfinite(row_lo) and np.isfinite(row_hi) and row_lo < row_hi:
+            pad  = (row_hi - row_lo) * 0.05
+            lims = [row_lo - pad, row_hi + pad]
+            for c in range(n_cols):
+                axes[r, c].set_xlim(lims)
+                axes[r, c].set_ylim(lims)
+                axes[r, c].plot(lims, lims, "k--", linewidth=0.8, zorder=10)
+
+    fig.suptitle(
+        f"y vs ŷ — all surrogate × GT combinations  (iter {iteration})\n"
+        "blue = random MAVE test split    orange = uniform eval library",
+        fontsize=11,
+    )
+    fig.tight_layout(rect=[0, 0, 1, 0.97])
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    fig.savefig(out_path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print(f"[16-panel y vs ŷ] saved → {out_path}")
 
 
 # ---------------------------------------------------------------------------
@@ -215,7 +342,7 @@ def plot_random_library_distributions_three_nonlins(
     W_mut, mut_map, b0 = init_additive_noWT(rng, wt_oh, sigma=sigma_w, l1_w=l1_w, bias=bias)
     P_mut = init_pairwise_adjacent_noWT(rng, wt_oh, mut_map, sigma_P=sigma_P, l1_P=l1_P)
     edges, J = init_pairwise_potts_optionA(
-        rng, wt_oh, p_edge=0.30, df=5.0, lambda_J=0.5, p_rescue=0.10, wt_rowcol_zero=True,
+        rng, wt_oh, p_edge=0.70, df=5.0, lambda_J=2.0, p_rescue=0.10, wt_rowcol_zero=True,
     )
 
     def make_bins(arrs):
@@ -231,17 +358,35 @@ def plot_random_library_distributions_three_nonlins(
         s_pair    = pairwise_potts_energy(x_mut, edges, J, b=0.0)
         s_addpair = s_add + s_pair
 
-        y_add            = s_add.reshape(-1)
-        y_addpair        = s_addpair.reshape(-1)
-        # Normalise each energy stream to unit std so the nonlinearity
-        # parameters are scale-invariant (prevents pairwise saturation).
-        s_add_n     = s_add     / (np.std(s_add)     + 1e-8)
-        s_addpair_n = s_addpair / (np.std(s_addpair) + 1e-8)
-        y_nonlin_add     = apply_global_nonlin(s_add_n,     nonlin_name, nonlin_kwargs).reshape(-1)
-        y_nonlin_addpair = apply_global_nonlin(s_addpair_n, nonlin_name, nonlin_kwargs).reshape(-1)
+        y_add     = s_add.reshape(-1)
+        y_addpair = s_addpair.reshape(-1)
 
-        wt0              = np.array([0.0])
-        wt_nonlin_add    = float(apply_global_nonlin(wt0, nonlin_name, nonlin_kwargs).reshape(-1)[0])
+        if nonlin_name == "sigmoid":
+            # Both normalised by std_add — NOT std_addpair — so pairwise penalties
+            # retain their full magnitude and push nonlin_additive_pairwise further
+            # into the negative tail than nonlin_additive.
+            std_add     = float(np.std(s_add)) + 1e-8
+            s_add_n     = s_add     / std_add
+            s_addpair_n = s_addpair / std_add
+            wt_nl        = float(apply_global_nonlin(np.array([[0.0]]), nonlin_name, nonlin_kwargs))
+            y_nonlin_add     = apply_global_nonlin(s_add_n,     nonlin_name, nonlin_kwargs).reshape(-1) - wt_nl
+            y_nonlin_addpair = apply_global_nonlin(s_addpair_n, nonlin_name, nonlin_kwargs).reshape(-1) - wt_nl
+            wt_nonlin_add     = 0.0
+            wt_nonlin_addpair = 0.0
+        else:
+            # Z-score, then anchor so WT → 0 and all mutations are ≤ 0.
+            mean_add     = float(np.mean(s_add))
+            std_add      = float(np.std(s_add))  + 1e-8
+            s_add_n     = (s_add     - mean_add) / std_add
+            s_addpair_n = (s_addpair - mean_add) / std_add
+            # WT raw score = 0, so WT z-score = (0 - mean) / std
+            wt_z_add     = (0.0 - mean_add) / std_add
+            wt_nl_add     = float(apply_global_nonlin(np.array([[wt_z_add]]), nonlin_name, nonlin_kwargs))
+            wt_nl_addpair = wt_nl_add
+            y_nonlin_add     = apply_global_nonlin(s_add_n,     nonlin_name, nonlin_kwargs).reshape(-1) - wt_nl_add
+            y_nonlin_addpair = apply_global_nonlin(s_addpair_n, nonlin_name, nonlin_kwargs).reshape(-1) - wt_nl_addpair
+            wt_nonlin_add     = 0.0
+            wt_nonlin_addpair = 0.0
 
         all_scores[nonlin_name] = {
             "additive": y_add, "additive_pairwise": y_addpair,
@@ -249,7 +394,7 @@ def plot_random_library_distributions_three_nonlins(
         }
         wt_scores[nonlin_name] = {
             "additive": 0.0, "additive_pairwise": 0.0,
-            "nonlin_additive": wt_nonlin_add, "nonlin_additive_pairwise": wt_nonlin_add,
+            "nonlin_additive": wt_nonlin_add, "nonlin_additive_pairwise": wt_nonlin_addpair,
         }
 
         bin_edges = make_bins([y_add, y_addpair, y_nonlin_add, y_nonlin_addpair])
@@ -273,9 +418,10 @@ def plot_random_library_distributions_three_nonlins(
             plt.savefig(f"{save_dir}/random_dist_{nonlin_name}.png", dpi=300)
         plt.close(fig)
 
-    mix_tanh_kwargs = init_mix_tanh_nonlin(rng, n_components=50)
+    s_add_raw       = additive_affinity_noWT(x_mut, W_mut, mut_map, b0)
+    sigmoid_kwargs  = init_sigmoid_nonlin(s_add_raw)
     tanh_kwargs     = init_tanh_nonlin(rng)
-    plot_one("mix_tanh", mix_tanh_kwargs)
+    plot_one("sigmoid", sigmoid_kwargs)
     plot_one("tanh", tanh_kwargs)
     plot_one("softmax_gate", dict(
         gate_logits=np.array([1.0, -1.0]), gate_temperature=1.0, tanh_alpha=0.5, tanh_beta=0.0,
@@ -286,7 +432,7 @@ def plot_random_library_distributions_three_nonlins(
             "params": {"W_mut": W_mut, "edges": edges, "J": J, "b": b0, "mut_map": mut_map},
             "scores": all_scores,
             "wt_scores": wt_scores,
-            "nonlin_kwargs": {"mix_tanh": mix_tanh_kwargs, "tanh": tanh_kwargs},
+            "nonlin_kwargs": {"sigmoid": sigmoid_kwargs, "tanh": tanh_kwargs},
         }
 
 
@@ -580,7 +726,7 @@ def plot_raw_pairs_as_LxL_cells_with_4x4_inside(
 
 def plot_gt_weight_dists_per_function(
     *, W_mut, edges, J, gt_keys, outdir, bw_scale=1.25, clip=(0.5, 99.5),
-    drop_pairwise_zeros=True,
+    drop_pairwise_zeros=True, peak_normalize=False,
 ):
     """KDE plots of GT weights (additive + pairwise) per ground-truth function."""
     os.makedirs(outdir, exist_ok=True)
@@ -608,20 +754,29 @@ def plot_gt_weight_dists_per_function(
 
             plt.figure(figsize=(8.5, 5))
             if a.size >= 5 and np.nanstd(a) > 0:
-                plt.plot(grid, _kde_line(a, grid, bw_scale=bw_scale),
-                         linewidth=2.3, label=f"GT additive weights (N={a.size})")
+                kde_a = _kde_line(a, grid, bw_scale=bw_scale)
+                if peak_normalize:
+                    kde_a = kde_a / max(kde_a.max(), 1e-12)
+                plt.plot(grid, kde_a, linewidth=2.3, label=f"GT additive weights (N={a.size})")
             if include_pair and p.size >= 5 and np.nanstd(p) > 0:
-                plt.plot(grid, _kde_line(p, grid, bw_scale=bw_scale),
-                         linewidth=2.3, linestyle="--",
+                kde_p = _kde_line(p, grid, bw_scale=bw_scale)
+                if peak_normalize:
+                    kde_p = kde_p / max(kde_p.max(), 1e-12)
+                plt.plot(grid, kde_p, linewidth=2.3, linestyle="--",
                          label=f"GT pairwise weights (N={p.size})")
+            if peak_normalize:
+                plt.ylim(0, 1.05)
 
             xlabel = "log10(|weight| + 1e-8)" if log_version else "weight"
+            ylabel = "normalized density" if peak_normalize else "density"
             plt.title(f"Ground-truth weight distributions — {gt}" +
                       (" (logabs)" if log_version else ""))
-            plt.xlabel(xlabel); plt.ylabel("density")
+            plt.xlabel(xlabel); plt.ylabel(ylabel)
             plt.grid(True, linestyle="--", alpha=0.35); plt.legend(); plt.tight_layout()
 
             suffix  = "logabs" if log_version else "raw"
+            if peak_normalize:
+                suffix = suffix + "_peaknorm"
             outpng  = os.path.join(outdir, f"GT_weight_dist_{gt}_{suffix}.png")
             plt.savefig(outpng, dpi=300); plt.close()
             print(f"[saved] {outpng}")
@@ -682,6 +837,7 @@ def plot_kde_grid_surrogate_vs_gt(
     out_png,
     log_version=False,
     bw_scale=1.3,
+    peak_normalize=False,
 ):
     """4×4 grid: rows = surrogate configs, cols = GT keys."""
     n_rows, n_cols = len(cfg_names), len(gt_keys)
@@ -718,18 +874,25 @@ def plot_kde_grid_surrogate_vs_gt(
             grid = np.linspace(lo, hi, 500)
 
             if x_add.size >= 5 and np.nanstd(x_add) > 0:
-                ax.plot(grid, _kde_curve(x_add, grid, bw_scale=bw_scale),
-                        linewidth=2.0, label="additive")
+                kde_a = _kde_curve(x_add, grid, bw_scale=bw_scale)
+                if peak_normalize:
+                    kde_a = kde_a / max(kde_a.max(), 1e-12)
+                ax.plot(grid, kde_a, linewidth=2.0, label="additive")
             if gpmap == "pairwise" and x_pair.size >= 5 and np.nanstd(x_pair) > 0:
-                ax.plot(grid, _kde_curve(x_pair, grid, bw_scale=bw_scale),
-                        linewidth=2.0, linestyle="--", label="pairwise")
+                kde_p = _kde_curve(x_pair, grid, bw_scale=bw_scale)
+                if peak_normalize:
+                    kde_p = kde_p / max(kde_p.max(), 1e-12)
+                ax.plot(grid, kde_p, linewidth=2.0, linestyle="--", label="pairwise")
+            if peak_normalize:
+                ax.set_ylim(0, 1.05)
 
             if r == 0: ax.set_title(gt_key, fontsize=11)
             if c == 0: ax.set_ylabel(cfg_name, fontsize=11)
             ax.grid(True, linestyle="--", alpha=0.35)
 
     xlabel = "log10(|coef| + 1e-8)" if log_version else "coefficient"
-    fig.supxlabel(xlabel); fig.supylabel("density")
+    ylabel = "normalized density" if peak_normalize else "density"
+    fig.supxlabel(xlabel); fig.supylabel(ylabel)
 
     handles, labels = axes[0, 0].get_legend_handles_labels()
     if handles:
