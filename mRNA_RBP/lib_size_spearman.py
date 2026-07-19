@@ -19,6 +19,8 @@ Usage:
         --out_coef mRNA_RBP/outputs/surrogate_coefs/
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import os
@@ -29,7 +31,6 @@ from scipy.stats import spearmanr
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(_HERE, ".."))
-sys.path.insert(0, os.path.join(_HERE, "..", "scripts"))
 sys.path.insert(0, os.path.join(_HERE, "..", "squid-nn"))
 sys.path.insert(0, os.path.join(_HERE, "..", "squid-manuscript", "squid"))
 
@@ -37,15 +38,36 @@ import squid.surrogate_zoo
 from mRNA_RBP.generate_libraries import (
     OUT_BASE, N_INSTANCES, MUT_RATES_PCT, LIB_SIZES,
     SEQ, STEM_PAIRS, MOTIF_POSITIONS, GT_KEYS, TYPE2_TARGET_N, STEM_SIGMA,
+    activity_balanced_path,
 )
 from mRNA_RBP.gt_init import MrnaRbpGroundTruth
+from mRNA_RBP.oracles import (
+    MRNA_ORACLE,
+    RESIDUALBIND_MSI1_ORACLE,
+    build_oracle,
+    default_output_base,
+    normalize_oracle_name,
+    oracle_gt_keys,
+    primary_gt_key,
+)
+from mRNA_RBP.sequence_configs import (
+    vts1_sequence_config,
+)
+from mRNA_RBP.seq_utils import rna_to_one_hot
 from mRNA_RBP.evaluate import (
     make_additive_dataset, make_pairwise_dataset,
-    make_ssm_deltas, predict_ssm,
+    make_ssm_deltas, make_ssm_deltas_from_scores, predict_ssm,
 )
 import mRNA_RBP.viz as viz
 
 NUCS   = ["A", "C", "G", "U"]
+
+
+def _sequence_for_oracle(oracle_name: str, wt_activity: str = "high"):
+    oracle_name = normalize_oracle_name(oracle_name)
+    if oracle_name != MRNA_ORACLE and oracle_name != RESIDUALBIND_MSI1_ORACLE:
+        return vts1_sequence_config(wt_activity)
+    return SEQ, STEM_PAIRS, MOTIF_POSITIONS
 _NUCS_A = np.array(list("ACGU"))
 
 SURROGATE_CONFIGS = {
@@ -133,6 +155,30 @@ def _rho(y_true, y_hat):
     return float(spearmanr(y_true[mask], y_hat[mask])[0])
 
 
+def _uses_cached_residualbind_scores(oracle_name: str) -> bool:
+    oracle_name = normalize_oracle_name(oracle_name)
+    return oracle_name != MRNA_ORACLE and oracle_name != RESIDUALBIND_MSI1_ORACLE
+
+
+def _ssm_deltas_from_cached_file(ssm_path: str, wt_oh: np.ndarray,
+                                 score_key: str) -> tuple[np.ndarray, float]:
+    """Reconstruct additive SSM deltas from generate_ssm() output order.
+
+    Cached SSM scores are converted to true deltas:
+    single-mutant score minus WT score.  New caches store wt_score_<key>.
+    Older synthetic and WT-relative ResidualBind caches do not, and use 0.0.
+    """
+    d = np.load(ssm_path)
+    scores = d[f"scores_{score_key}"].astype(float)
+    wt_idx = np.argmax(wt_oh, axis=1)
+    wt_key = f"wt_score_{score_key}"
+    wt_activity = float(d[wt_key][0]) if wt_key in d.files else 0.0
+    delta_W = make_ssm_deltas_from_scores(
+        d["nuc_ids"], scores, wt_idx=wt_idx, wt_activity=wt_activity
+    )
+    return delta_W, wt_activity
+
+
 def train_surrogate(X: np.ndarray, y: np.ndarray, cfg: dict):
     N   = X.shape[0]
     bsz = max(32, min(N // 150, 2048))
@@ -161,7 +207,7 @@ def train_surrogate(X: np.ndarray, y: np.ndarray, cfg: dict):
     return wrapper, model, test_df
 
 
-def extract_surrogate_coefs(wrapper, cfg: dict) -> dict:
+def extract_surrogate_coefs(wrapper, cfg: dict, stem_pairs=STEM_PAIRS) -> dict:
     """Extract additive (and pairwise) weight matrices from a trained surrogate.
 
     Returns dict with:
@@ -182,7 +228,7 @@ def extract_surrogate_coefs(wrapper, cfg: dict) -> dict:
         J = np.asarray(params[2], dtype=np.float32)  # (L, 4, L, 4) from MAVE-NN
         result["J"] = J
         beta = {}
-        for (i, j) in STEM_PAIRS:
+        for (i, j) in stem_pairs:
             if i < J.shape[0] and j < J.shape[2]:
                 beta[(i, j)] = J[i, :, j, :]   # (4, 4)
         result["beta"] = beta
@@ -194,38 +240,68 @@ def extract_surrogate_coefs(wrapper, cfg: dict) -> dict:
 # Saturated mutagenesis ρ
 # ---------------------------------------------------------------------------
 
-def compute_saturated_rho(k: int) -> dict:
-    """Spearman ρ for the SSM additive predictor on both type2 and pairwise eval libs.
+def compute_saturated_rho(k: int, oracle_name=MRNA_ORACLE,
+                          out_base=OUT_BASE, gt_keys=GT_KEYS,
+                          residualbind_dir=None,
+                          wt_activity: str = "high") -> dict:
+    """Spearman rho for the SSM additive predictor on activity-balanced and pairwise eval libs.
 
-    Returns {gt_key: {"type2": float, "pairwise": float}}.
+    Returns {gt_key: {"type2": float, "pairwise": float, "type3": float}}.
     """
-    gt      = MrnaRbpGroundTruth(SEQ, STEM_PAIRS, MOTIF_POSITIONS, seed=k, stem_sigma=STEM_SIGMA)
-    wt_oh   = gt.wt_one_hot()
-    delta_W = make_ssm_deltas(wt_oh, gt)
+    seq, stem_pairs, motif_positions = _sequence_for_oracle(oracle_name, wt_activity)
+    primary = primary_gt_key(oracle_name)
+    inst_dir      = os.path.join(out_base, f"instance_{k:02d}")
+    if _uses_cached_residualbind_scores(oracle_name):
+        wt_oh = rna_to_one_hot(seq).astype(np.float32)
+        delta_W, ssm_wt_activity = _ssm_deltas_from_cached_file(
+            os.path.join(inst_dir, "ssm.npz"), wt_oh, primary
+        )
+    else:
+        gt = build_oracle(
+            oracle_name,
+            seq=seq,
+            stem_pairs=stem_pairs,
+            motif_positions=motif_positions,
+            seed=k,
+            stem_sigma=STEM_SIGMA,
+            residualbind_dir=residualbind_dir,
+        )
+        wt_oh   = gt.wt_one_hot()
+        ssm_wt_activity = float(gt.score_all(wt_oh[None, :, :])[primary][0])
+        delta_W = make_ssm_deltas(
+            wt_oh, gt, score_key=primary, wt_activity=ssm_wt_activity
+        )
 
-    inst_dir      = os.path.join(OUT_BASE, f"instance_{k:02d}")
-    type2_path    = os.path.join(inst_dir, "type2.npz")
+    type2_path    = activity_balanced_path(inst_dir)
     pairwise_path = os.path.join(inst_dir, "pairwise_lib.npz")
+    type3_path    = os.path.join(inst_dir, "type3.npz")
 
-    nan_entry = {"type2": float("nan"), "pairwise": float("nan")}
+    nan_entry = {"type2": float("nan"), "pairwise": float("nan"), "type3": float("nan")}
     if not os.path.exists(type2_path):
-        return {gt_key: dict(nan_entry) for gt_key in GT_KEYS}
+        return {gt_key: dict(nan_entry) for gt_key in gt_keys}
 
     ev2    = np.load(type2_path)
     X2     = np.eye(4, dtype=np.float32)[ev2["nuc_ids"]]
-    yhat2  = predict_ssm(X2, delta_W, wt_activity=0.0)
+    yhat2  = predict_ssm(X2, delta_W, wt_activity=ssm_wt_activity)
 
     has_pw = os.path.exists(pairwise_path)
     if has_pw:
         evp   = np.load(pairwise_path)
         Xp    = np.eye(4, dtype=np.float32)[evp["nuc_ids"]]
-        yhatp = predict_ssm(Xp, delta_W, wt_activity=0.0)
+        yhatp = predict_ssm(Xp, delta_W, wt_activity=ssm_wt_activity)
+
+    has_t3 = os.path.exists(type3_path)
+    if has_t3:
+        evt   = np.load(type3_path)
+        Xt    = np.eye(4, dtype=np.float32)[evt["nuc_ids"]]
+        yhatt = predict_ssm(Xt, delta_W, wt_activity=ssm_wt_activity)
 
     result = {}
-    for gt_key in GT_KEYS:
+    for gt_key in gt_keys:
         rho_t2 = _rho(ev2[f"scores_{gt_key}"].astype(float), yhat2)
         rho_pw = _rho(evp[f"scores_{gt_key}"].astype(float), yhatp) if has_pw else float("nan")
-        result[gt_key] = {"type2": rho_t2, "pairwise": rho_pw}
+        rho_t3 = _rho(evt[f"scores_{gt_key}"].astype(float), yhatt) if has_t3 else float("nan")
+        result[gt_key] = {"type2": rho_t2, "pairwise": rho_pw, "type3": rho_t3}
     return result
 
 
@@ -237,7 +313,11 @@ TYPE1_EVAL_SIZES = [200, 2_000, 20_000]   # fixed type1 eval libs, always evalua
 
 
 def run_instance_condition(k: int, pct: int, n_lib: int,
-                           cfg_name: str, gt_key: str) -> tuple:
+                           cfg_name: str, gt_key: str,
+                           oracle_name=MRNA_ORACLE,
+                           out_base=OUT_BASE,
+                           residualbind_dir=None,
+                           wt_activity: str = "high") -> tuple:
     """Train one surrogate; return (rho_rand,
                                     rho_type1_200, rho_type1_2000, rho_type1_20000,
                                     rho_type2, rho_pairwise, coefs).
@@ -245,43 +325,82 @@ def run_instance_condition(k: int, pct: int, n_lib: int,
     All eval libraries are evaluated for every training condition regardless
     of the training lib size.
     """
-    inst_dir      = os.path.join(OUT_BASE, f"instance_{k:02d}")
+    inst_dir      = os.path.join(out_base, f"instance_{k:02d}")
     rand_path     = os.path.join(inst_dir, f"mut{pct:02d}", f"lib_{n_lib}.npz")
-    type2_path    = os.path.join(inst_dir, "type2.npz")
+    type2_path    = activity_balanced_path(inst_dir)
     pairwise_path = os.path.join(inst_dir, "pairwise_lib.npz")
+    type3_path    = os.path.join(inst_dir, "type3.npz")
 
-    _nan7 = (float("nan"),) * 6 + ({},)
+    _nan7 = (float("nan"),) * 7 + ({},)
 
     if not os.path.exists(type2_path):
-        print(f"      [SKIP] missing type2 for instance {k:02d}")
+        print(f"      [SKIP] missing activity-balanced library for instance {k:02d}")
         return _nan7
 
     # Load eval nuc_ids for leakage removal
     type2_ids    = np.load(type2_path)["nuc_ids"]
     pairwise_ids = np.load(pairwise_path)["nuc_ids"] if os.path.exists(pairwise_path) else None
 
-    gt = MrnaRbpGroundTruth(SEQ, STEM_PAIRS, MOTIF_POSITIONS,
-                             seed=k, stem_sigma=STEM_SIGMA)
+    seq, stem_pairs, motif_positions = _sequence_for_oracle(oracle_name, wt_activity)
+    use_cached_scores = _uses_cached_residualbind_scores(oracle_name)
+    gt = None
 
     if os.path.exists(rand_path):
         d       = np.load(rand_path)
         nuc_ids = d["nuc_ids"][:n_lib]
+        y_cached = d[f"scores_{gt_key}"][:n_lib].reshape(-1, 1) if use_cached_scores else None
     else:
         # Generate training library on the fly
+        if use_cached_scores:
+            print(f"      [SKIP] missing cached ResidualBind train library {rand_path}")
+            return _nan7
         print(f"      [gen] {rand_path} missing — generating {n_lib} seqs from GT")
+        gt = build_oracle(
+            oracle_name,
+            seq=seq,
+            stem_pairs=stem_pairs,
+            motif_positions=motif_positions,
+            seed=k,
+            stem_sigma=STEM_SIGMA,
+            residualbind_dir=residualbind_dir,
+        )
         wt_oh = gt.wt_one_hot()
         mc    = max(1, round(pct * wt_oh.shape[0] / 100))
         rng   = np.random.default_rng(k * 10_000 + pct * 100 + n_lib)
         nuc_ids = _generate_pool(wt_oh, n_lib, mc, rng)
+        y_cached = None
 
     # Remove any training sequences that appear in eval libraries
-    nuc_ids, n_removed = _exclude_eval_seqs(nuc_ids, type2_ids, pairwise_ids)
+    keep_nuc_ids, n_removed = _exclude_eval_seqs(nuc_ids, type2_ids, pairwise_ids)
     if n_removed:
         print(f"      [dedup] removed {n_removed} train seqs found in eval libs")
+    if y_cached is not None and len(keep_nuc_ids) != len(nuc_ids):
+        eval_seqs = set()
+        for arr in (type2_ids, pairwise_ids):
+            if arr is not None and len(arr):
+                for row in arr:
+                    eval_seqs.add(row.tobytes())
+        keep_mask = np.array([row.tobytes() not in eval_seqs
+                              for row in nuc_ids], dtype=bool)
+        y_cached = y_cached[keep_mask]
+    nuc_ids = keep_nuc_ids
 
     # Score after filtering (ensures y aligns with deduplicated nuc_ids)
     X     = np.eye(4, dtype=np.float32)[nuc_ids]
-    y_all = gt.score_all(X)[gt_key].reshape(-1, 1)
+    if y_cached is not None:
+        y_all = y_cached
+    else:
+        if gt is None:
+            gt = build_oracle(
+                oracle_name,
+                seq=seq,
+                stem_pairs=stem_pairs,
+                motif_positions=motif_positions,
+                seed=k,
+                stem_sigma=STEM_SIGMA,
+                residualbind_dir=residualbind_dir,
+            )
+        y_all = gt.score_all(X)[gt_key].reshape(-1, 1)
 
     cfg = SURROGATE_CONFIGS[cfg_name]
     try:
@@ -312,12 +431,13 @@ def run_instance_condition(k: int, pct: int, n_lib: int,
 
     rho_type2    = _eval_on(type2_path, gt_key)
     rho_pairwise = _eval_on(pairwise_path, gt_key) if os.path.exists(pairwise_path) else float("nan")
+    rho_type3    = _eval_on(type3_path, gt_key) if os.path.exists(type3_path) else float("nan")
 
-    coefs = extract_surrogate_coefs(wrapper, cfg)
+    coefs = extract_surrogate_coefs(wrapper, cfg, stem_pairs=stem_pairs)
     tf.keras.backend.clear_session()
     return (rho_rand,
             rho_type1[200], rho_type1[2_000], rho_type1[20_000],
-            rho_type2, rho_pairwise,
+            rho_type2, rho_pairwise, rho_type3,
             coefs)
 
 
@@ -335,11 +455,17 @@ def save_coefs(coef_dir: str, k: int, pct: int, n_lib: int,
 
 def generate_notebook_plots(k: int, pct: int, n_lib: int,
                             cfg_name: str, gt_key: str,
-                            coefs: dict, plot_dir: str):
+                            coefs: dict, plot_dir: str,
+                            oracle_name=MRNA_ORACLE,
+                            residualbind_dir=None,
+                            save_svg: bool = False):
     """Coefficient comparison + structured eval plots for one (instance, condition)."""
     if not coefs or "alpha" not in coefs:
         return
 
+    oracle_name = normalize_oracle_name(oracle_name)
+    if oracle_name != MRNA_ORACLE:
+        return
     gt    = MrnaRbpGroundTruth(SEQ, STEM_PAIRS, MOTIF_POSITIONS, seed=k, stem_sigma=STEM_SIGMA)
     wt_oh = gt.wt_one_hot()
     L     = len(SEQ)
@@ -354,10 +480,11 @@ def generate_notebook_plots(k: int, pct: int, n_lib: int,
     fig_gt, fig_sur = viz.plot_gt_vs_surrogate(gt, sur_alpha, sur_beta, L)
     fig_gt.savefig(os.path.join(plot_dir, f"{stem}_coef_gt.png"),
                    dpi=110, bbox_inches='tight')
-    fig_gt.savefig(os.path.join(plot_dir, f"{stem}_coef_gt.svg"), bbox_inches='tight')
     fig_sur.savefig(os.path.join(plot_dir, f"{stem}_coef_sur.png"),
                     dpi=110, bbox_inches='tight')
-    fig_sur.savefig(os.path.join(plot_dir, f"{stem}_coef_sur.svg"), bbox_inches='tight')
+    if save_svg:
+        fig_gt.savefig(os.path.join(plot_dir, f"{stem}_coef_gt.svg"), bbox_inches='tight')
+        fig_sur.savefig(os.path.join(plot_dir, f"{stem}_coef_sur.svg"), bbox_inches='tight')
     import matplotlib.pyplot as plt
     plt.close('all')
 
@@ -366,7 +493,8 @@ def generate_notebook_plots(k: int, pct: int, n_lib: int,
         fig_blocks = viz.plot_stem_blocks(gt.beta, sur_beta, STEM_PAIRS)
         fig_blocks.savefig(os.path.join(plot_dir, f"{stem}_stem_blocks.png"),
                            dpi=110, bbox_inches='tight')
-        fig_blocks.savefig(os.path.join(plot_dir, f"{stem}_stem_blocks.svg"), bbox_inches='tight')
+        if save_svg:
+            fig_blocks.savefig(os.path.join(plot_dir, f"{stem}_stem_blocks.svg"), bbox_inches='tight')
         plt.close('all')
 
     # Structured additive eval
@@ -383,7 +511,8 @@ def generate_notebook_plots(k: int, pct: int, n_lib: int,
                                      k_labels, y_ssm=y_add_ssm)
     fig_add.savefig(os.path.join(plot_dir, f"{stem}_additive_eval.png"),
                     dpi=110, bbox_inches='tight')
-    fig_add.savefig(os.path.join(plot_dir, f"{stem}_additive_eval.svg"), bbox_inches='tight')
+    if save_svg:
+        fig_add.savefig(os.path.join(plot_dir, f"{stem}_additive_eval.svg"), bbox_inches='tight')
     plt.close('all')
 
     # Structured pairwise eval
@@ -408,7 +537,8 @@ def generate_notebook_plots(k: int, pct: int, n_lib: int,
                                     y_ssm=y_pw_ssm)
     fig_pw.savefig(os.path.join(plot_dir, f"{stem}_pairwise_eval.png"),
                    dpi=110, bbox_inches='tight')
-    fig_pw.savefig(os.path.join(plot_dir, f"{stem}_pairwise_eval.svg"), bbox_inches='tight')
+    if save_svg:
+        fig_pw.savefig(os.path.join(plot_dir, f"{stem}_pairwise_eval.svg"), bbox_inches='tight')
     plt.close('all')
 
 
@@ -421,17 +551,42 @@ def main():
                         default=os.path.join(_HERE, "outputs", "surrogate_coefs"))
     parser.add_argument("--plots", action="store_true",
                         help="Generate notebook-style coefficient+eval plots")
+    parser.add_argument("--svg", action="store_true",
+                        help="Also save an .svg copy of each notebook plot (requires --plots)")
     parser.add_argument("--plot_dir",
                         default=os.path.join(_HERE, "outputs", "notebook_plots"))
-    parser.add_argument("--gt_keys", nargs="+", default=["nonlin_additive_pairwise"],
+    parser.add_argument("--gt_keys", nargs="+", default=None,
                         help="GT keys to train on (default: nonlin_additive_pairwise)")
+    parser.add_argument("--oracle", default=MRNA_ORACLE,
+                        choices=[MRNA_ORACLE, "mrna", "residualbind", "residualbind_ensemble",
+                                 "residualbind_msi1", "vts1", "residualbind_vts1"])
+    parser.add_argument("--out_base", default=None,
+                        help="Library root. Defaults to outputs or outputs_<oracle>")
+    parser.add_argument("--residualbind_dir", default=None,
+                        help="Directory containing ResidualBind ensemble member*.pt checkpoints")
+    parser.add_argument("--wt_activity", choices=["high", "low"], default="high",
+                        help="VTS1 ResidualBind WT sequence context")
     parser.add_argument("--n_instances", type=int, default=N_INSTANCES,
                         help="Number of instances to run (default: all 10)")
     parser.add_argument("--mut_rates", nargs="+", type=int, default=MUT_RATES_PCT,
                         help="Mutation rates to run (default: all 3)")
     parser.add_argument("--lib_sizes", nargs="+", type=int, default=LIB_SIZES,
                         help="Library sizes to run (default: all 4)")
+    parser.add_argument("--recompute_saturated", action="store_true",
+                        help="Recompute saturated/SSM baseline entries even if cache exists")
+    parser.add_argument("--saturated_only", action="store_true",
+                        help="Stop after updating saturated/SSM baseline entries")
     args = parser.parse_args()
+
+    oracle_name = normalize_oracle_name(args.oracle)
+    out_base = args.out_base or default_output_base(_HERE, oracle_name)
+    gt_keys = args.gt_keys or [primary_gt_key(oracle_name)]
+    if args.out_json == os.path.join(_HERE, "outputs", "lib_size_spearman_results.json"):
+        args.out_json = os.path.join(out_base, "lib_size_spearman_results.json")
+    if args.out_coef == os.path.join(_HERE, "outputs", "surrogate_coefs"):
+        args.out_coef = os.path.join(out_base, "surrogate_coefs")
+    if args.plot_dir == os.path.join(_HERE, "outputs", "notebook_plots"):
+        args.plot_dir = os.path.join(out_base, "notebook_plots")
 
     if os.path.isfile(args.out_json):
         with open(args.out_json) as f:
@@ -439,6 +594,12 @@ def main():
         print(f"[resume] loaded cache from {args.out_json}")
     else:
         cache = {}
+    cache.setdefault("run_metadata", {})
+    cache["run_metadata"].update({
+        "oracle": oracle_name,
+        "wt_activity": args.wt_activity,
+        "out_base": out_base,
+    })
 
     def save():
         os.makedirs(os.path.dirname(args.out_json) or ".", exist_ok=True)
@@ -453,17 +614,26 @@ def main():
         existing = cache["saturated"].get(key, {})
         # Detect old flat-float format or missing pairwise split → recompute
         needs_update = (
+            args.recompute_saturated
+            or
             key not in cache["saturated"]
-            or any(not isinstance(v, dict) or "pairwise" not in v
+            or any(not isinstance(v, dict) or "pairwise" not in v or "type3" not in v
                    for v in existing.values())
         )
         if needs_update:
-            rho_sat = compute_saturated_rho(k)
+            rho_sat = compute_saturated_rho(
+                k, oracle_name=oracle_name, out_base=out_base,
+                gt_keys=gt_keys, residualbind_dir=args.residualbind_dir,
+                wt_activity=args.wt_activity,
+            )
             cache["saturated"][key] = rho_sat
             print(f"[saturated] instance {k:02d}  " +
-                  "  ".join(f"{gk}=t2:{v['type2']:.4f}/pw:{v['pairwise']:.4f}"
+                  "  ".join(f"{gk}=act:{v['type2']:.4f}/pw:{v['pairwise']:.4f}/t3:{v['type3']:.4f}"
                              for gk, v in rho_sat.items()))
             save()
+    if args.saturated_only:
+        save()
+        return
 
     # ── Surrogate results
     # cache["surrogate"][gt_key][cfg_name][str(pct)][str(n_lib)]
@@ -471,7 +641,7 @@ def main():
     if "surrogate" not in cache:
         cache["surrogate"] = {}
 
-    for gt_key in args.gt_keys:
+    for gt_key in gt_keys:
         if gt_key not in cache["surrogate"]:
             cache["surrogate"][gt_key] = {}
 
@@ -490,18 +660,20 @@ def main():
                         cache["surrogate"][gt_key][cfg_name][spct][sn] = {
                             "rand": [],
                             "type1_200": [], "type1_2000": [], "type1_20000": [],
-                            "type2": [], "pairwise": []}
+                            "type2": [], "pairwise": [], "type3": []}
                     entry = cache["surrogate"][gt_key][cfg_name][spct][sn]
                     # migrate old formats
-                    for old_key in ("eval", "type1", "ssm_lib", "type3"):
+                    for old_key in ("eval", "type1", "ssm_lib"):
                         entry.pop(old_key, None)
                     entry.setdefault("type1_200",   [])
                     entry.setdefault("type1_2000",  [])
                     entry.setdefault("type1_20000", [])
                     entry.setdefault("type2",    [])
                     entry.setdefault("pairwise", [])
+                    entry.setdefault("type3",    [])
 
-                    n_done = min(len(entry["rand"]), len(entry["pairwise"]))
+                    n_done = min(len(entry["rand"]), len(entry["pairwise"]),
+                                 len(entry["type3"]))
                     if n_done >= args.n_instances:
                         print(f"[skip] {gt_key}  {cfg_name}  "
                               f"mut{pct}%  lib{n_lib:,}  ({n_done} done)")
@@ -514,15 +686,21 @@ def main():
 
                     for k in range(n_done, args.n_instances):
                         print(f"  instance {k:02d} …", end="", flush=True)
-                        rr, rt1_200, rt1_2k, rt1_20k, rt2, rp, coefs = \
-                            run_instance_condition(k, pct, n_lib, cfg_name, gt_key)
+                        rr, rt1_200, rt1_2k, rt1_20k, rt2, rp, rt3, coefs = \
+                            run_instance_condition(
+                                k, pct, n_lib, cfg_name, gt_key,
+                                oracle_name=oracle_name, out_base=out_base,
+                                residualbind_dir=args.residualbind_dir,
+                                wt_activity=args.wt_activity,
+                            )
                         entry["rand"].append(rr)
                         entry["type1_200"].append(rt1_200)
                         entry["type1_2000"].append(rt1_2k)
                         entry["type1_20000"].append(rt1_20k)
                         entry["type2"].append(rt2)
                         entry["pairwise"].append(rp)
-                        print(f"  ρ_rand={rr:+.4f}  ρ_t2={rt2:+.4f}  ρ_pw={rp:+.4f}",
+                        entry["type3"].append(rt3)
+                        print(f"  ρ_rand={rr:+.4f}  ρ_activity_balanced={rt2:+.4f}  ρ_pw={rp:+.4f}  ρ_t3={rt3:+.4f}",
                               flush=True)
 
                         save_coefs(args.out_coef, k, pct, n_lib,
@@ -531,7 +709,10 @@ def main():
                         if args.plots and coefs:
                             generate_notebook_plots(
                                 k, pct, n_lib, cfg_name, gt_key,
-                                coefs, args.plot_dir)
+                                coefs, args.plot_dir,
+                                oracle_name=oracle_name,
+                                residualbind_dir=args.residualbind_dir,
+                                save_svg=args.svg)
 
                         save()
 

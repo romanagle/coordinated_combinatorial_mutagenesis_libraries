@@ -1,0 +1,36 @@
+[project]
+name = "rbp-benchmark"
+version = "0.1.0"
+description = "Model RNAcompete RBP binding and benchmark multiple methods (ResidualBind, AlphaGenome encoder fine-tuning, ...)."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    # Installed in the in-repo .venv; listed for completeness.
+    "alphagenome-encoder-ft",
+    "torch",
+    "numpy",
+    "h5py>=3.11.0",
+    "scipy>=1.10.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.uv.sources]
+alphagenome-encoder-ft = { git = "https://github.com/MasayukiNagai/alphagenome_encoder_ft.git" }
+torch = { index = "pytorch-cu126" }
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+

@@ -30,10 +30,9 @@ import sys
 import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "residualbind"))
 
-from ground_truth import (
+from mRNA_RBP.ground_truth import (
     init_additive_noWT,
     init_sigmoid_nonlin,
     soft_threshold,
@@ -41,7 +40,7 @@ from ground_truth import (
     pairwise_potts_energy,
     apply_global_nonlin,
 )
-from seq_utils import rna_to_one_hot
+from mRNA_RBP.seq_utils import rna_to_one_hot
 
 
 # ---------------------------------------------------------------------------

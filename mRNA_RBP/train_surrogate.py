@@ -27,16 +27,27 @@ from scipy.stats import spearmanr
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(_HERE, ".."))
-sys.path.insert(0, os.path.join(_HERE, "..", "scripts"))
 sys.path.insert(0, os.path.join(_HERE, "..", "squid-nn"))
 sys.path.insert(0, os.path.join(_HERE, "..", "squid-manuscript", "squid"))
 
 import squid.surrogate_zoo
 from mRNA_RBP.generate_libraries import (
     SEQ, STEM_PAIRS, MOTIF_POSITIONS, STEM_SIGMA,
-    OUT_BASE, N_INSTANCES, MUT_RATES_PCT, LIB_SIZES, GT_KEYS,
+    OUT_BASE, N_INSTANCES, MUT_RATES_PCT, LIB_SIZES,
+    activity_balanced_path,
 )
 from mRNA_RBP.gt_init import MrnaRbpGroundTruth
+from mRNA_RBP.oracles import (
+    MRNA_ORACLE,
+    RESIDUALBIND_MSI1_ORACLE,
+    build_oracle,
+    default_output_base,
+    normalize_oracle_name,
+    primary_gt_key,
+)
+from mRNA_RBP.sequence_configs import (
+    vts1_sequence_config,
+)
 from mRNA_RBP.evaluate import make_pairwise_dataset, make_ssm_deltas, predict_ssm
 
 COEF_DIR  = os.path.join(_HERE, "outputs", "surrogate_coefs")
@@ -71,7 +82,8 @@ def _rho(y_true, y_hat):
     return float(spearmanr(y_true[mask], y_hat[mask])[0])
 
 
-def train_surrogate(X: np.ndarray, y: np.ndarray):
+def train_surrogate(X: np.ndarray, y: np.ndarray, save_dir: str = None,
+                    epochs: int = 1000, patience: int = 50):
     N   = X.shape[0]
     bsz = max(32, min(N // 150, 2048))
     lr  = 5e-4 * min(1.0, (20_000 / N) ** 0.5)
@@ -89,9 +101,9 @@ def train_surrogate(X: np.ndarray, y: np.ndarray):
     )
     model, _, test_df = wrapper.train(
         X, y,
-        learning_rate=lr, epochs=1000, batch_size=bsz,
-        early_stopping=True, patience=50,
-        restore_best_weights=True, save_dir=None, verbose=0,
+        learning_rate=lr, epochs=epochs, batch_size=bsz,
+        early_stopping=True, patience=patience,
+        restore_best_weights=True, save_dir=save_dir, verbose=0,
     )
     return wrapper, model, test_df
 
@@ -110,8 +122,9 @@ def extract_coefs(wrapper) -> dict:
     return result
 
 
-def train_one(k: int, pct: int, n_lib: int, gt: MrnaRbpGroundTruth):
-    lib_path = os.path.join(OUT_BASE, f"instance_{k:02d}",
+def train_one(k: int, pct: int, n_lib: int, gt: MrnaRbpGroundTruth,
+              out_base: str, gt_key: str):
+    lib_path = os.path.join(out_base, f"instance_{k:02d}",
                             f"mut{pct:02d}", f"lib_{n_lib}.npz")
     if not os.path.isfile(lib_path):
         print(f"  [skip] missing {lib_path}")
@@ -120,7 +133,7 @@ def train_one(k: int, pct: int, n_lib: int, gt: MrnaRbpGroundTruth):
     d       = np.load(lib_path)
     nuc_ids = d["nuc_ids"]
     X       = np.eye(4, dtype=np.float32)[nuc_ids]
-    y_raw   = gt.score_all(X)[GT_KEY].astype(np.float32)
+    y_raw   = gt.score_all(X)[gt_key].astype(np.float32)
     y_mean  = float(y_raw.mean())
     y_std   = float(y_raw.std())
     if y_std < 1e-8:
@@ -142,29 +155,29 @@ def train_one(k: int, pct: int, n_lib: int, gt: MrnaRbpGroundTruth):
         predict_chunked(model, np.asarray(test_df[x_col])),
     )
 
-    type2_path = os.path.join(OUT_BASE, f"instance_{k:02d}", "type2.npz")
+    type2_path = activity_balanced_path(os.path.join(out_base, f"instance_{k:02d}"))
     rho_t2   = float("nan")
     yhat_t2  = np.array([], dtype=np.float32)
     y_t2_arr = np.array([], dtype=np.float32)
     if os.path.isfile(type2_path):
         d2       = np.load(type2_path)
         str_t2   = nuc_ids_to_str(d2["nuc_ids"])
-        y_t2     = d2[f"scores_{GT_KEY}"].astype(float)
+        y_t2     = d2[f"scores_{gt_key}"].astype(float)
         p_t2     = predict_chunked(model, str_t2)
         rho_t2   = _rho(y_t2, p_t2)
         yhat_t2  = (p_t2 * y_std + y_mean).astype(np.float32)
         y_t2_arr = y_t2.astype(np.float32)
 
     wt_oh = gt.wt_one_hot()
-    x_pw, y_pw_gt, _, _ = make_pairwise_dataset(wt_oh, gt)
+    x_pw, y_pw_gt, _, _ = make_pairwise_dataset(wt_oh, gt, score_key=gt_key)
     str_pw = nuc_ids_to_str(np.argmax(x_pw, axis=2).astype(np.uint8))
     rho_pw = _rho(y_pw_gt, predict_chunked(model, str_pw))
 
-    delta_W    = make_ssm_deltas(wt_oh, gt)
+    delta_W    = make_ssm_deltas(wt_oh, gt, score_key=gt_key)
     rho_ssm_pw = _rho(y_pw_gt, predict_ssm(x_pw, delta_W))
 
     print(f"  k={k} mut={pct:02d}% lib={n_lib:6d}  "
-          f"ρ_rand={rho_rand:+.3f}  ρ_t2={rho_t2:+.3f}  "
+          f"ρ_rand={rho_rand:+.3f}  ρ_activity_balanced={rho_t2:+.3f}  "
           f"ρ_pw={rho_pw:+.3f}  (ssm_pw={rho_ssm_pw:+.3f})")
 
     yhat_lib = (predict_chunked(model, nuc_ids_to_str(nuc_ids)) * y_std + y_mean).astype(np.float32)
@@ -188,50 +201,84 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--n_instances", type=int, default=1)
     parser.add_argument("--lib_sizes", nargs="+", type=int, default=LIB_SIZES)
+    parser.add_argument("--oracle", default=MRNA_ORACLE,
+                        choices=[MRNA_ORACLE, "mrna", "residualbind", "residualbind_ensemble",
+                                 "residualbind_msi1", "vts1", "residualbind_vts1"])
+    parser.add_argument("--out_base", default=None,
+                        help="Library root. Defaults to outputs or outputs_<oracle>")
+    parser.add_argument("--out_coef", default=None,
+                        help="Coefficient directory. Defaults under the selected output root")
+    parser.add_argument("--out_json", default=None,
+                        help="Results JSON. Defaults under the selected output root")
+    parser.add_argument("--gt_key", default=None,
+                        help="Score key to train on. Defaults to the oracle primary key")
+    parser.add_argument("--residualbind_dir", default=None,
+                        help="Directory containing ResidualBind ensemble member*.pt checkpoints")
+    parser.add_argument("--wt_activity", choices=["high", "low"], default="high",
+                        help="VTS1 ResidualBind WT sequence context")
     args = parser.parse_args()
 
-    os.makedirs(COEF_DIR, exist_ok=True)
-    os.makedirs(os.path.dirname(JSON_PATH), exist_ok=True)
+    oracle_name = normalize_oracle_name(args.oracle)
+    out_base = args.out_base or default_output_base(_HERE, oracle_name)
+    gt_key = args.gt_key or primary_gt_key(oracle_name)
+    coef_dir = args.out_coef or os.path.join(out_base, "surrogate_coefs")
+    json_path = args.out_json or os.path.join(out_base, "lib_size_spearman_results.json")
+
+    os.makedirs(coef_dir, exist_ok=True)
+    os.makedirs(os.path.dirname(json_path), exist_ok=True)
 
     cache = {}
-    if os.path.isfile(JSON_PATH):
-        with open(JSON_PATH) as f:
+    if os.path.isfile(json_path):
+        with open(json_path) as f:
             cache = json.load(f)
 
     for k in range(args.n_instances):
-        inst_dir = os.path.join(OUT_BASE, f"instance_{k:02d}")
+        inst_dir = os.path.join(out_base, f"instance_{k:02d}")
         if not os.path.isdir(inst_dir):
             print(f"[skip] instance {k:02d}: no data")
             continue
-        gt = MrnaRbpGroundTruth(SEQ, STEM_PAIRS, MOTIF_POSITIONS,
-                                 seed=k, stem_sigma=STEM_SIGMA)
+        use_vts1_seq = oracle_name != MRNA_ORACLE and oracle_name != RESIDUALBIND_MSI1_ORACLE
+        if use_vts1_seq:
+            seq, stem_pairs, motif_positions = vts1_sequence_config(args.wt_activity)
+        else:
+            seq, stem_pairs, motif_positions = SEQ, STEM_PAIRS, MOTIF_POSITIONS
+        gt = build_oracle(
+            oracle_name,
+            seq=seq,
+            stem_pairs=stem_pairs,
+            motif_positions=motif_positions,
+            seed=k,
+            stem_sigma=STEM_SIGMA,
+            residualbind_dir=args.residualbind_dir,
+        )
         for pct in MUT_RATES_PCT:
             for n_lib in args.lib_sizes:
                 print(f"[train SQUID] k={k} mut={pct}% lib={n_lib}")
-                res = train_one(k, pct, n_lib, gt)
+                res = train_one(k, pct, n_lib, gt, out_base, gt_key)
                 if res is None:
                     continue
 
                 stem = (f"coefs_k{k:02d}_mut{pct:02d}_lib{n_lib}"
-                        "_nonlinear_additive_p_pairwise_nonlin_additive_pairwise")
+                        f"_nonlinear_additive_p_pairwise_{gt_key}")
                 arrays = {key: val for key, val in res.items()
                           if key in ("alpha", "J", "y_mean", "y_std",
                                      "yhat_lib", "y_lib", "yhat_t2", "y_t2")}
-                np.savez_compressed(os.path.join(COEF_DIR, stem + ".npz"), **arrays)
+                np.savez_compressed(os.path.join(coef_dir, stem + ".npz"), **arrays)
 
-                cache_key = f"{CFG_KEY}|{GT_KEY}|{pct}|{n_lib}|{k}"
+                cache_key = f"{oracle_name}|{args.wt_activity}|{CFG_KEY}|{gt_key}|{pct}|{n_lib}|{k}"
                 cache[cache_key] = {
-                    "cfg": CFG_KEY, "gt_key": GT_KEY,
+                    "oracle": oracle_name, "cfg": CFG_KEY, "gt_key": gt_key,
+                    "wt_activity": args.wt_activity,
                     "pct": pct, "n_lib": n_lib, "k": k,
                     "rho_rand": res["rho_rand"],
                     "rho_t2":   res["rho_t2"],
                     "rho_pw":   res["rho_pw"],
                 }
 
-        with open(JSON_PATH, "w") as f:
+        with open(json_path, "w") as f:
             json.dump(cache, f, indent=2)
 
-    print(f"\nDone. Coefs in {COEF_DIR}/")
+    print(f"\nDone. Coefs in {coef_dir}/")
 
 
 if __name__ == "__main__":

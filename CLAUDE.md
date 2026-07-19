@@ -4,7 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this project does
 
-Benchmarks SQUID/MAVE-NN surrogate models against a synthetic mRNA-RBP ground truth. The ground truth is a manually-specified stem-loop RNA sequence scored by a noWT additive + pairwise Potts energy model passed through a sigmoid nonlinearity. Everything in `scripts/` is support code for this; the active pipeline lives entirely in `mRNA_RBP/`.
+This repository contains SQUID/MAVE-NN surrogate-model benchmarking experiments.
+The active `mRNA_RBP/` experiment uses a synthetic, manually specified mRNA
+stem-loop ground truth: noWT additive mutation effects at non-stem positions,
+explicit stem-pair coupling blocks for non-compensatory double mutations, and a
+sigmoid nonlinearity anchored so WT = 0. All active code lives in `mRNA_RBP/`.
+Old exploratory scripts live in `archive/scripts_old/`. The `scripts/` directory is empty.
 
 ## Python environment
 
@@ -28,15 +33,17 @@ python mRNA_RBP/generate_libraries.py --n_instances 1
 python mRNA_RBP/lib_size_spearman.py  --n_instances 1
 
 # Individual plot scripts (after lib_size_spearman.py has run)
-python mRNA_RBP/plot_library_distributions.py
-python mRNA_RBP/plot_coefficients.py
-python mRNA_RBP/plot_pairwise_heatmaps.py
-python mRNA_RBP/plot_scatter_grid.py --eval_type type2
-python mRNA_RBP/plot_rho_vs_libsize.py
-python mRNA_RBP/bar_surrogate_models.py
+python mRNA_RBP/plots/plot_library_distributions.py
+python mRNA_RBP/plots/plot_coefficients.py
+python mRNA_RBP/plots/plot_pairwise_heatmaps.py
+python mRNA_RBP/plots/plot_scatter_grid.py --eval_type type2
+python mRNA_RBP/plots/plot_rho_vs_libsize.py
+python mRNA_RBP/plots/bar_surrogate_models.py
 ```
 
 ## Module map (`mRNA_RBP/`)
+
+**Core pipeline** (top level — imported by other scripts):
 
 | File | Role |
 |------|------|
@@ -46,11 +53,18 @@ python mRNA_RBP/bar_surrogate_models.py
 | `train_surrogate.py` | Standalone surrogate trainer for the nonlinear additive+pairwise config |
 | `evaluate.py` | Structured eval datasets: additive (non-stem k-mutants), pairwise (stem 4×4 grids), SSM |
 | `viz.py` | Coefficient plots mirroring the demo notebook style |
+| `oracles.py` | ResidualBind oracle builder + `default_output_base` helper |
+| `cross_mutrate_eval.py` | Cross-mut-rate Spearman eval helpers |
+| `generate_varied_mutrate_library.py` | VTS1 varied-mut-rate library generation |
 | `master_job.sh` | Orchestrates the full pipeline end-to-end |
 
-Shared utilities from `scripts/` that `mRNA_RBP/` imports:
-- `scripts/ground_truth.py` — `additive_affinity_noWT`, `pairwise_potts_energy`, `apply_global_nonlin`, `init_sigmoid_nonlin`, `soft_threshold`, `uniformize_by_histogram`
-- `scripts/seq_utils.py` — `rna_to_one_hot`
+**`plots/`** — 23 standalone plot scripts (run after pipeline; write to `outputs/notebook_plots/`)
+
+**`experiments/`** — 15 one-off experiment scripts (VTS1, cross-mut-rate, MSI1, ResidualBind type3 comparisons)
+
+Shared utilities (now part of `mRNA_RBP/`):
+- `mRNA_RBP/ground_truth.py` — `additive_affinity_noWT`, `pairwise_potts_energy`, `apply_global_nonlin`, `init_sigmoid_nonlin`, `soft_threshold`, `uniformize_by_histogram`
+- `mRNA_RBP/seq_utils.py` — `rna_to_one_hot`
 
 ## Ground truth: `MrnaRbpGroundTruth`
 

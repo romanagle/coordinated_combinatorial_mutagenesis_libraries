@@ -697,7 +697,8 @@ def plot_pairwise_eval(y_gt, y_sur, pair_labels, nuc_combos, stem_pairs, *,
                        y_ssm=None, title='Pairwise evaluation',
                        max_pairs=None, show_title=True,
                        sur_label='Surrogate', ssm_label='SSM baseline',
-                       per_col_norm=False, wt_nuc_ids=None) -> plt.Figure:
+                       per_col_norm=False, wt_nuc_ids=None,
+                       annotate_values=False) -> plt.Figure:
     """4×4 activity heatmaps for each stem pair: GT, surrogate (and SSM baseline).
 
     Each heatmap shows activity for all 16 nucleotide combinations at the stem
@@ -718,6 +719,7 @@ def plot_pairwise_eval(y_gt, y_sur, pair_labels, nuc_combos, stem_pairs, *,
     per_col_norm : bool — normalize each column independently (stretches contrast)
     wt_nuc_ids   : (L,) int array of WT nucleotide indices — draws a black box
                    around the WT cell in every heatmap when provided
+    annotate_values : bool — write each cell's unnormalized activity value
     """
     import matplotlib.patches as mpatches
     NUCS_LABEL = ['A', 'C', 'G', 'U']
@@ -734,15 +736,20 @@ def plot_pairwise_eval(y_gt, y_sur, pair_labels, nuc_combos, stem_pairs, *,
 
     col_titles = ['GT', sur_label] + ([ssm_label] if y_ssm is not None else [])
     col_data   = [y_gt, y_sur] + ([y_ssm] if y_ssm is not None else [])
-    cmap = plt.cm.Blues_r
+    has_positive = any(float(np.asarray(yd).max()) > 0 for yd in col_data)
+    cmap = plt.cm.RdBu_r if has_positive else plt.cm.Blues_r
 
     if per_col_norm:
         col_vabs = [max(float(np.abs(yd).max()), 1e-6) for yd in col_data]
-        col_norms = [plt.Normalize(vmin=-1, vmax=0)] * ncols
+        if has_positive:
+            col_norms = [plt.Normalize(vmin=-1, vmax=1)] * ncols
+        else:
+            col_norms = [plt.Normalize(vmin=-1, vmax=0)] * ncols
     else:
         all_y = np.concatenate([np.asarray(yd).ravel() for yd in col_data])
         vabs  = max(float(np.abs(all_y).max()), 1e-6)
-        shared_norm = plt.Normalize(vmin=-vabs, vmax=0)
+        vmax = vabs if has_positive else 0
+        shared_norm = plt.Normalize(vmin=-vabs, vmax=vmax)
         col_norms = [shared_norm] * ncols
 
     nuc_combos = list(nuc_combos)
@@ -761,15 +768,27 @@ def plot_pairwise_eval(y_gt, y_sur, pair_labels, nuc_combos, stem_pairs, *,
 
         per_pair_data = [yg_p, ys_p] + ([yssm_p] if yssm_p is not None else [])
         if per_col_norm:
-            mats = [_to_mat(vals / col_vabs[c]) for c, vals in enumerate(per_pair_data)]
+            mats = [
+                _to_mat(np.zeros_like(vals) if np.ptp(vals) < 1e-8 else vals / col_vabs[c])
+                for c, vals in enumerate(per_pair_data)
+            ]
         else:
             mats = [_to_mat(d) for d in per_pair_data]
+        raw_mats = [_to_mat(d) for d in per_pair_data]
 
         si, sj = stem_pairs[pidx]
         for col, M in enumerate(mats):
             ax = axes[pidx, col]
             ax.imshow(M, cmap=cmap, norm=col_norms[col], aspect='equal',
                       origin='upper', interpolation='nearest')
+            if annotate_values:
+                raw_M = raw_mats[col]
+                for row in range(4):
+                    for cell_col in range(4):
+                        text_color = 'white' if abs(M[row, cell_col]) > 0.55 else 'black'
+                        ax.text(cell_col, row, f'{raw_M[row, cell_col]:.2f}',
+                                ha='center', va='center',
+                                fontsize=5.5, color=text_color)
             ax.set_xticks(range(4)); ax.set_xticklabels(NUCS_LABEL, fontsize=7)
             ax.set_yticks(range(4)); ax.set_yticklabels(NUCS_LABEL, fontsize=7)
             if pidx == 0:
@@ -794,7 +813,7 @@ def plot_pairwise_eval(y_gt, y_sur, pair_labels, nuc_combos, stem_pairs, *,
             sm = plt.cm.ScalarMappable(cmap=cmap, norm=col_norms[col])
             sm.set_array([])
             fig.colorbar(sm, ax=col_axes, fraction=0.046, pad=0.08,
-                         orientation='horizontal', label='Activity score')
+                         orientation='horizontal', label='Normalized activity score')
     else:
         sm = plt.cm.ScalarMappable(cmap=cmap, norm=col_norms[0])
         sm.set_array([])

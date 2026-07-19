@@ -5,14 +5,16 @@ Structured evaluation datasets mirroring demo_additive_pairwise (3).ipynb:
 
   make_additive_dataset  – k-mutant seqs restricted to non-stem positions
   make_pairwise_dataset  – all 16 nucleotide combos per declared stem pair
-  make_ssm_deltas        – (4, L) single-site delta weight matrix from GT
+  make_ssm_deltas        – (4, L) single-site delta-from-WT matrix from GT
+  make_ssm_deltas_from_scores – same matrix from cached SSM scores
   predict_ssm            – additive SSM prediction for one-hot sequences
 """
 
 import numpy as np
 
 
-def make_additive_dataset(wt_oh, gt, ks=(2, 3, 5), n_per_k=500, seed=0):
+def make_additive_dataset(wt_oh, gt, ks=(2, 3, 5), n_per_k=500, seed=0,
+                          score_key="nonlin_additive_pairwise"):
     """k-mutant sequences with mutations drawn only from non-stem positions.
 
     Because the GT has no pairwise interaction outside stem positions, activity
@@ -55,11 +57,11 @@ def make_additive_dataset(wt_oh, gt, ks=(2, 3, 5), n_per_k=500, seed=0):
     nuc_ids  = np.stack(seqs).astype(np.uint8)
     x        = np.eye(4, dtype=np.float32)[nuc_ids]
     scores   = gt.score_all(x)
-    y_gt     = scores["nonlin_additive_pairwise"]
+    y_gt     = scores[score_key]
     return x, y_gt, np.array(labels, dtype=int)
 
 
-def make_pairwise_dataset(wt_oh, gt):
+def make_pairwise_dataset(wt_oh, gt, score_key="nonlin_additive_pairwise"):
     """All 16 nucleotide combinations for each declared stem pair.
 
     For each stem pair (i, j), enumerate all 4×4 combinations while holding
@@ -96,16 +98,21 @@ def make_pairwise_dataset(wt_oh, gt):
     nuc_ids     = np.stack(seqs).astype(np.uint8)
     x           = np.eye(4, dtype=np.float32)[nuc_ids]
     scores      = gt.score_all(x)
-    y_gt        = scores["nonlin_additive_pairwise"]
+    y_gt        = scores[score_key]
     return x, y_gt, np.array(plabels, dtype=int), combos
 
 
-def make_ssm_deltas(wt_oh, gt):
+def make_ssm_deltas(wt_oh, gt, score_key="nonlin_additive_pairwise",
+                    wt_activity=None):
     """Build (4, L) additive delta weight matrix from single-site GT scores.
 
-    Each cell [nuc, pos] = GT score of the sequence with position pos mutated
-    to nucleotide nuc (all other positions WT).  WT nucleotide at each position
-    has delta = 0 by GT construction.
+    Each cell [nuc, pos] is the change from WT:
+
+        score(sequence with pos -> nuc) - score(WT)
+
+    For synthetic GTs, score(WT) is zero by construction.  For ResidualBind or
+    other raw-score oracles, the subtraction is required; otherwise a multi-
+    mutant SSM prediction would count the WT intercept once per mutation.
 
     Returns
     -------
@@ -125,12 +132,63 @@ def make_ssm_deltas(wt_oh, gt):
 
     nuc_ids = np.stack(seqs).astype(np.uint8)
     x       = np.eye(4, dtype=np.float32)[nuc_ids]
-    scores  = gt.score_all(x)["nonlin_additive_pairwise"]
+    scores  = gt.score_all(x)[score_key]
+    if wt_activity is None:
+        wt_activity = float(gt.score_all(wt_oh[None, :, :])[score_key][0])
+    else:
+        wt_activity = float(wt_activity)
 
     delta_W = np.zeros((4, L), dtype=np.float64)
     for idx, (pos, nuc) in enumerate(zip(positions, nucs)):
-        delta_W[nuc, pos] = float(scores[idx])
+        delta_W[nuc, pos] = float(scores[idx]) - wt_activity
+    delta_W[wt_idx, np.arange(L)] = 0.0
 
+    return delta_W
+
+
+def make_ssm_deltas_from_scores(nuc_ids, scores, wt_idx=None, wt_activity=0.0):
+    """Reconstruct additive SSM deltas from cached single-mutant scores.
+
+    Parameters
+    ----------
+    nuc_ids     : (N, L) uint8 SSM sequences, normally L*3 non-WT mutants
+    scores      : (N,) score for each row
+    wt_idx      : optional (L,) WT nucleotide ids.  If omitted, inferred by
+                  majority vote per position from an L*3 SSM library.
+    wt_activity : scalar WT score in the same coordinate system as scores.
+
+    Returns
+    -------
+    delta_W : (4, L) float64 where entries are score(single mutant) - WT.
+    """
+    nuc_ids = np.asarray(nuc_ids, dtype=np.uint8)
+    scores = np.asarray(scores, dtype=np.float64)
+    if nuc_ids.ndim != 2:
+        raise ValueError(f"nuc_ids must have shape (N, L), got {nuc_ids.shape}")
+    if scores.shape[0] != nuc_ids.shape[0]:
+        raise ValueError(
+            f"scores length {scores.shape[0]} does not match nuc_ids rows {nuc_ids.shape[0]}"
+        )
+
+    L = nuc_ids.shape[1]
+    if wt_idx is None:
+        wt_idx = np.array(
+            [np.bincount(nuc_ids[:, pos], minlength=4).argmax() for pos in range(L)],
+            dtype=np.uint8,
+        )
+    else:
+        wt_idx = np.asarray(wt_idx, dtype=np.uint8)
+        if wt_idx.shape != (L,):
+            raise ValueError(f"wt_idx must have shape ({L},), got {wt_idx.shape}")
+
+    delta_W = np.zeros((4, L), dtype=np.float64)
+    for seq, score in zip(nuc_ids, scores):
+        changed = np.flatnonzero(seq != wt_idx)
+        if len(changed) != 1:
+            continue
+        pos = int(changed[0])
+        delta_W[int(seq[pos]), pos] = float(score) - float(wt_activity)
+    delta_W[wt_idx, np.arange(L)] = 0.0
     return delta_W
 
 

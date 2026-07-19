@@ -1,0 +1,26 @@
+{
+  "model": "residualbind",
+  "ensemble": {
+    "n_members": 10,
+    "base_seed": 43
+  },
+  "data": {
+    "sequence_length": null,
+    "normalization": "log_norm",
+    "batch_size": 100,
+    "num_workers": 4
+  },
+  "model_args": {},
+  "stages": [
+    {
+      "trainable": "all",
+      "lr": 1e-3,
+      "weight_decay": 0.0,
+      "num_epochs": 300,
+      "patience": 20,
+      "lr_decay": 0.3,
+      "decay_patience": 7
+    }
+  ],
+  "seed": 43
+}

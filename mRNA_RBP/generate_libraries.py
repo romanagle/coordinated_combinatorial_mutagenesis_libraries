@@ -26,16 +26,29 @@ Output tree:
 import os
 import sys
 import time
+from typing import Optional
 import numpy as np
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(_HERE, ".."))
-sys.path.insert(0, os.path.join(_HERE, "..", "scripts"))
 sys.path.insert(0, os.path.join(_HERE, "..", "residualbind"))
 
 from mRNA_RBP.gt_init import MrnaRbpGroundTruth
-from ground_truth import uniformize_by_histogram
-from seq_utils import rna_to_one_hot
+from mRNA_RBP.oracles import (
+    MRNA_GT_KEYS,
+    MRNA_ORACLE,
+    RESIDUALBIND_MSI1_ORACLE,
+    build_oracle,
+    default_output_base,
+    normalize_oracle_name,
+    oracle_gt_keys,
+    primary_gt_key,
+)
+from mRNA_RBP.ground_truth import uniformize_by_histogram
+from mRNA_RBP.seq_utils import rna_to_one_hot
+from mRNA_RBP.sequence_configs import (
+    vts1_sequence_config,
+)
 
 
 # ===========================================================================
@@ -58,19 +71,19 @@ LIB_SIZES            = [200, 2_000, 20_000]
 CHUNK                = 100_000
 OUT_BASE             = os.path.join(_HERE, "outputs")
 N_POOL_PER_RATE_EVAL = 300_000   # seqs per mut rate for type1 eval pool
-TYPE2_TARGET_N       = 20_000    # total seqs in the type2 eval lib
-TYPE2_MUT_RANGE      = [2, 3, 4] # mutation counts in the mixed eval lib
-TYPE2_MAX_2MUT       = 6_500     # cap on 2-mut seqs (only ~7,380 unique exist for L=41)
-TYPE2_POOL_PER_MUT   = 100_000   # random pool per mutation count (3-mut, 4-mut)
+ACTIVITY_BALANCED_TARGET_N     = 20_000
+ACTIVITY_BALANCED_CANDIDATE_N  = 200_000
+ACTIVITY_BALANCED_MUT_COUNTS   = [3, 5, 7, 15]
+
+# Backward-compatible aliases for older analysis scripts/results schemas.
+# New outputs should use activity_balanced.npz only; do not create type2.npz.
+TYPE2_TARGET_N       = ACTIVITY_BALANCED_TARGET_N
+TYPE2_MUT_RANGE      = ACTIVITY_BALANCED_MUT_COUNTS
+TYPE2_POOL_PER_MUT   = ACTIVITY_BALANCED_CANDIDATE_N // len(ACTIVITY_BALANCED_MUT_COUNTS)
 
 SEQS = [SEQ] * N_INSTANCES
 
-GT_KEYS = [
-    "additive",
-    "additive_pairwise",
-    "nonlin_additive",
-    "nonlin_additive_pairwise",
-]
+GT_KEYS = MRNA_GT_KEYS
 
 
 # ===========================================================================
@@ -107,20 +120,37 @@ def generate_pool(wt_onehot: np.ndarray, n_seqs: int,
     return nuc_ids
 
 
-def score_pool(nuc_ids: np.ndarray, gt: MrnaRbpGroundTruth) -> dict:
+def sample_unique_mutants(wt_onehot: np.ndarray, mut_count: int,
+                          target_n: int, rng, max_rounds: int = 12) -> np.ndarray:
+    """Sample exactly target_n unique mutants when combinatorially feasible."""
+    collected = None
+    n_request = int(target_n)
+    for _ in range(max_rounds):
+        pool = generate_pool(wt_onehot, n_request, mut_count, rng)
+        collected = pool if collected is None else np.concatenate([collected, pool], axis=0)
+        collected = np.unique(collected, axis=0)
+        if len(collected) >= target_n:
+            return collected[:target_n]
+        n_request = max((target_n - len(collected)) * 3, 1)
+    return collected
+
+
+def score_pool(nuc_ids: np.ndarray, gt: MrnaRbpGroundTruth,
+               gt_keys=None) -> dict:
     """Score a pool via gt.score_all() in memory-safe chunks.
 
     Returns dict mapping each GT_KEY to a (N,) float32 array.
     All scores ≤ 0 with WT = 0 by MrnaRbpGroundTruth construction.
     """
     N    = nuc_ids.shape[0]
-    pool = {k: np.empty(N, dtype=np.float32) for k in GT_KEYS}
+    gt_keys = gt_keys or GT_KEYS
+    pool = {k: np.empty(N, dtype=np.float32) for k in gt_keys}
 
     for start in range(0, N, CHUNK):
         end    = min(start + CHUNK, N)
         X      = np.eye(4, dtype=np.float32)[nuc_ids[start:end]]
         scores = gt.score_all(X)
-        for k in GT_KEYS:
+        for k in gt_keys:
             pool[k][start:end] = scores[k]
 
     return pool
@@ -143,12 +173,16 @@ def generate_ssm(wt_onehot: np.ndarray) -> np.ndarray:
     return nuc_ids
 
 
-def save_npz(path: str, nuc_ids: np.ndarray, scores: dict, edges: np.ndarray):
+def save_npz(path: str, nuc_ids: np.ndarray, scores: dict, edges: np.ndarray,
+             gt_keys=None, extra: Optional[dict] = None):
+    gt_keys = gt_keys or GT_KEYS
+    extra = extra or {}
     np.savez_compressed(
         path,
         nuc_ids=nuc_ids,
         edges=edges,
-        **{f"scores_{k}": scores[k] for k in GT_KEYS},
+        **{f"scores_{k}": scores[k] for k in gt_keys},
+        **extra,
     )
 
 
@@ -156,20 +190,24 @@ def save_npz(path: str, nuc_ids: np.ndarray, scores: dict, edges: np.ndarray):
 # ── Main pipeline ─────────────────────────────────────────────────────────
 # ===========================================================================
 
-def _missing_lib_sizes(mut_dir):
-    missing_rand = [n for n in LIB_SIZES
+def _missing_lib_sizes(mut_dir, lib_sizes=LIB_SIZES):
+    missing_rand = [n for n in lib_sizes
                     if not os.path.exists(os.path.join(mut_dir, f"lib_{n}.npz"))]
     return missing_rand
 
 
-def generate_pairwise_lib(k: int, inst_dir: str, gt: MrnaRbpGroundTruth):
+def generate_pairwise_lib(k: int, inst_dir: str, gt: MrnaRbpGroundTruth,
+                          gt_keys=None,
+                          primary_key: str = "nonlin_additive_pairwise",
+                          force: bool = False):
+    gt_keys = gt_keys or GT_KEYS
     """All 16 nucleotide combinations per stem pair (other positions at WT).
 
     N = 16 × len(STEM_PAIRS) sequences.  Deterministic — no randomness needed.
     Saves inst_dir/pairwise_lib.npz.
     """
     path = os.path.join(inst_dir, "pairwise_lib.npz")
-    if os.path.exists(path):
+    if os.path.exists(path) and not force:
         print(f"  pairwise_lib exists — skip")
         return
 
@@ -177,7 +215,7 @@ def generate_pairwise_lib(k: int, inst_dir: str, gt: MrnaRbpGroundTruth):
     wt_idx = np.argmax(wt_oh, axis=1).astype(np.uint8)
 
     seqs = []
-    for (si, sj) in STEM_PAIRS:
+    for (si, sj) in gt.stem_pairs:
         for ni in range(4):
             for nj in range(4):
                 seq      = wt_idx.copy()
@@ -188,16 +226,36 @@ def generate_pairwise_lib(k: int, inst_dir: str, gt: MrnaRbpGroundTruth):
     nuc_ids = np.stack(seqs).astype(np.uint8)
     X       = np.eye(4, dtype=np.float32)[nuc_ids]
     scores  = gt.score_all(X)
-    save_npz(path, nuc_ids, scores, gt.edges)
+    save_npz(path, nuc_ids, scores, gt.edges, gt_keys)
     print(f"  pairwise_lib saved  n={len(nuc_ids)}  "
-          f"nonlin_add_pair ∈ [{scores['nonlin_additive_pairwise'].min():.4f}, "
-          f"{scores['nonlin_additive_pairwise'].max():.4f}]")
+          f"{primary_key} ∈ [{scores[primary_key].min():.4f}, "
+          f"{scores[primary_key].max():.4f}]")
 
 
 
 
-def generate_type1_type2(k: int, inst_dir: str, gt: MrnaRbpGroundTruth):
-    """Build mixed-rate Type1 (per lib_size) and Type2 (shared 20K) eval libs.
+def _activity_balanced_paths(inst_dir: str) -> tuple:
+    return (
+        os.path.join(inst_dir, "activity_balanced.npz"),
+        os.path.join(inst_dir, "type2.npz"),
+    )
+
+
+def activity_balanced_path(inst_dir: str) -> str:
+    """Canonical activity-balanced library path, with read-only legacy fallback."""
+    path, legacy_path = _activity_balanced_paths(inst_dir)
+    return path if os.path.exists(path) else legacy_path
+
+
+def generate_type1_activity_balanced(k: int, inst_dir: str, gt: MrnaRbpGroundTruth,
+                                     out_base: str = OUT_BASE,
+                                     gt_keys=None,
+                                     primary_key: str = "nonlin_additive_pairwise",
+                                     lib_sizes=None,
+                                     force: bool = False):
+    gt_keys = gt_keys or GT_KEYS
+    lib_sizes = lib_sizes or LIB_SIZES
+    """Build mixed-rate Type1 eval libs and the activity-balanced eval lib.
 
     Draws N_POOL_PER_RATE_EVAL sequences from each mutation rate's pool_2M.npz,
     combines them into one pool, scores all 4 GT keys, then uniformizes by
@@ -205,21 +263,33 @@ def generate_type1_type2(k: int, inst_dir: str, gt: MrnaRbpGroundTruth):
 
     Saves:
         inst_dir/type1_lib{N}.npz   target_n = max(1, int(0.2 * N))
-        inst_dir/type2.npz          target_n = TYPE2_TARGET_N
+        inst_dir/activity_balanced.npz  target_n = ACTIVITY_BALANCED_TARGET_N
     Each file: nuc_ids, rate_labels, edges, scores_{key} for all GT_KEYS.
+
+    Activity-balanced initialization:
+      1. Draw unique exact-mutant candidates at 3, 5, 7, and 15 mutations.
+      2. Use ACTIVITY_BALANCED_CANDIDATE_N total candidates split as evenly
+         as possible across those mutation counts.
+      3. Deduplicate globally.
+      4. Score with the selected oracle's primary score.
+      5. Histogram-uniformize in score space with 200 equal-width bins,
+         percentile clipping [1, 99], and seed k*10_000 + 600.
+      6. Cap at ACTIVITY_BALANCED_TARGET_N sequences. The final count can be
+         lower than the cap if nonempty score bins are sparse.
     """
-    need = [f"type1_lib{N}" for N in LIB_SIZES
-            if not os.path.exists(os.path.join(inst_dir, f"type1_lib{N}.npz"))]
-    if not os.path.exists(os.path.join(inst_dir, "type2.npz")):
-        need.append("type2")
+    activity_path, _legacy_type2_path = _activity_balanced_paths(inst_dir)
+    need = [f"type1_lib{N}" for N in lib_sizes
+            if force or not os.path.exists(os.path.join(inst_dir, f"type1_lib{N}.npz"))]
+    if force or not os.path.exists(activity_path):
+        need.append("activity_balanced")
     if not need:
-        print(f"  type1/type2 all present — skip")
+        print(f"  type1/activity-balanced all present — skip")
         return
 
-    print(f"  building type1/type2 (missing: {need})")
+    print(f"  building type1/activity-balanced (missing: {need})")
     rng = np.random.default_rng(k * 10_000 + 500)
     all_nuc_ids, all_labels = [], []
-    all_scores = {key: [] for key in GT_KEYS}
+    all_scores = {key: [] for key in gt_keys}
 
     for pct in MUT_RATES_PCT:
         pool_path = os.path.join(inst_dir, f"mut{pct:02d}", "pool_2M.npz")
@@ -232,17 +302,17 @@ def generate_type1_type2(k: int, inst_dir: str, gt: MrnaRbpGroundTruth):
         idx = rng.choice(actual_n, size=n_sample, replace=False)
         all_nuc_ids.append(d["nuc_ids"][idx])
         all_labels.append(np.full(n_sample, pct, dtype=np.uint8))
-        for key in GT_KEYS:
+        for key in gt_keys:
             all_scores[key].append(d[f"scores_{key}"][idx])
 
     if not all_nuc_ids:
-        print(f"    [WARN] no pools found — aborting type1/type2")
+        print(f"    [WARN] no pools found — aborting type1/activity-balanced")
         return
 
     combined_ids    = np.concatenate(all_nuc_ids, axis=0)
     combined_labels = np.concatenate(all_labels,  axis=0)
-    combined_scores = {key: np.concatenate(all_scores[key]) for key in GT_KEYS}
-    primary         = combined_scores["nonlin_additive_pairwise"].astype(float)
+    combined_scores = {key: np.concatenate(all_scores[key]) for key in gt_keys}
+    primary         = combined_scores[primary_key].astype(float)
 
     def _save(path, keep_idx):
         np.savez_compressed(
@@ -250,12 +320,12 @@ def generate_type1_type2(k: int, inst_dir: str, gt: MrnaRbpGroundTruth):
             nuc_ids     = combined_ids[keep_idx],
             rate_labels = combined_labels[keep_idx],
             edges       = gt.edges,
-            **{f"scores_{key}": combined_scores[key][keep_idx] for key in GT_KEYS},
+            **{f"scores_{key}": combined_scores[key][keep_idx] for key in gt_keys},
         )
 
-    for N in LIB_SIZES:
+    for N in lib_sizes:
         path = os.path.join(inst_dir, f"type1_lib{N}.npz")
-        if os.path.exists(path):
+        if os.path.exists(path) and not force:
             continue
         target_n = max(1, int(0.2 * N))
         n_bins   = min(200, target_n)
@@ -266,40 +336,19 @@ def generate_type1_type2(k: int, inst_dir: str, gt: MrnaRbpGroundTruth):
         _save(path, keep)
         print(f"    saved type1_lib{N}  n={len(keep)}")
 
-    path = os.path.join(inst_dir, "type2.npz")
-    if not os.path.exists(path):
+    if force or not os.path.exists(activity_path):
         rng2   = np.random.default_rng(k * 10_000 + 599)
         wt_oh  = gt.wt_one_hot()
-        wt_idx = np.argmax(wt_oh, axis=1).astype(np.uint8)
-        L2     = len(wt_idx)
-
         all_ids, all_labels = [], []
 
-        # 2-mut: enumerate all unique 2-mutation sequences, cap at TYPE2_MAX_2MUT
-        seqs2 = []
-        for p1 in range(L2):
-            for p2 in range(p1 + 1, L2):
-                wt1, wt2 = int(wt_idx[p1]), int(wt_idx[p2])
-                for n1 in range(4):
-                    if n1 == wt1: continue
-                    for n2 in range(4):
-                        if n2 == wt2: continue
-                        s = wt_idx.copy(); s[p1] = n1; s[p2] = n2
-                        seqs2.append(s)
-        pool2 = np.unique(np.stack(seqs2).astype(np.uint8), axis=0)
-        if len(pool2) > TYPE2_MAX_2MUT:
-            pool2 = pool2[rng2.choice(len(pool2), size=TYPE2_MAX_2MUT, replace=False)]
-        all_ids.append(pool2)
-        all_labels.append(np.full(len(pool2), 2, dtype=np.uint8))
-        print(f"    type2: 2-mut pool  n={len(pool2):,}")
-
-        # 3-mut and 4-mut: random pool, deduplicate
-        for n_mut in [3, 4]:
-            pool = generate_pool(wt_oh, TYPE2_POOL_PER_MUT, n_mut, rng2)
-            pool = np.unique(pool, axis=0)
+        per_count, rem = divmod(ACTIVITY_BALANCED_CANDIDATE_N,
+                                len(ACTIVITY_BALANCED_MUT_COUNTS))
+        for i, n_mut in enumerate(ACTIVITY_BALANCED_MUT_COUNTS):
+            n_candidates = per_count + (1 if i < rem else 0)
+            pool = sample_unique_mutants(wt_oh, n_mut, n_candidates, rng2)
             all_ids.append(pool)
             all_labels.append(np.full(len(pool), n_mut, dtype=np.uint8))
-            print(f"    type2: {n_mut}-mut pool  n={len(pool):,}")
+            print(f"    activity-balanced: {n_mut}-mut candidate pool  n={len(pool):,}")
 
         all_ids    = np.concatenate(all_ids, axis=0)
         all_labels = np.concatenate(all_labels, axis=0)
@@ -307,80 +356,126 @@ def generate_type1_type2(k: int, inst_dir: str, gt: MrnaRbpGroundTruth):
         uniq_idx.sort()
         all_ids    = all_ids[uniq_idx]
         all_labels = all_labels[uniq_idx]
-        print(f"    type2: {len(all_ids):,} unique sequences after global dedup")
+        print(f"    activity-balanced: {len(all_ids):,} unique sequences after global dedup")
 
-        pool_scores = score_pool(all_ids, gt)
-        primary     = pool_scores["nonlin_additive_pairwise"].astype(float)
+        pool_scores = score_pool(all_ids, gt, gt_keys)
+        primary     = pool_scores[primary_key].astype(float)
         _, keep     = uniformize_by_histogram(
             primary, X=None, n_bins=200, clip_lo=1, clip_hi=99,
-            target_n=TYPE2_TARGET_N, seed=k * 10_000 + 600,
+            target_n=ACTIVITY_BALANCED_TARGET_N, seed=k * 10_000 + 600,
         )
         t2_ids    = all_ids[keep]
         t2_labels = all_labels[keep]
-        t2_scores = {key: pool_scores[key][keep] for key in GT_KEYS}
-        np.savez_compressed(
-            path,
-            nuc_ids     = t2_ids,
-            rate_labels = t2_labels,
-            edges       = gt.edges,
-            **{f"scores_{key}": t2_scores[key] for key in GT_KEYS},
+        t2_scores = {key: pool_scores[key][keep] for key in gt_keys}
+        payload = dict(
+            nuc_ids=t2_ids,
+            rate_labels=t2_labels,
+            edges=gt.edges,
+            activity_balanced_init=np.array([
+                "candidate_mut_counts=3,5,7,15;candidate_n=200000;"
+                "histogram_uniformize_bins=200;clip_percentiles=1,99;"
+                "target_n=20000;seed=k*10000+600"
+            ]),
+            **{f"scores_{key}": t2_scores[key] for key in gt_keys},
         )
-        s = t2_scores["nonlin_additive_pairwise"]
+        np.savez_compressed(activity_path, **payload)
+        s = t2_scores[primary_key]
         vals, cnts = np.unique(t2_labels, return_counts=True)
         dist_str = "  ".join(f"{m}mut:{c}" for m, c in zip(vals, cnts))
-        print(f"    saved type2  n={len(t2_ids)} (uniformized from {len(all_ids):,} unique)  "
-              f"nonlin_add_pair ∈ [{s.min():.4f}, {s.max():.4f}]")
+        print(f"    saved activity-balanced library  n={len(t2_ids)} "
+              f"(uniformized from {len(all_ids):,} unique)  "
+              f"{primary_key} ∈ [{s.min():.4f}, {s.max():.4f}]")
         print(f"    mutation count distribution: {dist_str}")
 
 
-def run_pipeline(n_instances: int = N_INSTANCES, pool_size: int = N_LARGE):
-    L = len(SEQ)
+def run_pipeline(n_instances: int = N_INSTANCES, pool_size: int = N_LARGE,
+                 oracle_name: str = MRNA_ORACLE,
+                 out_base: Optional[str] = None,
+                 residualbind_dir: Optional[str] = None,
+                 wt_activity: str = "high"):
+    oracle_name = normalize_oracle_name(oracle_name)
+    gt_keys = oracle_gt_keys(oracle_name)
+    primary_key = primary_gt_key(oracle_name)
+    out_base = out_base or default_output_base(_HERE, oracle_name)
+    use_vts1_seq = oracle_name != MRNA_ORACLE and oracle_name != RESIDUALBIND_MSI1_ORACLE
+    if use_vts1_seq:
+        seq, stem_pairs, motif_positions = vts1_sequence_config(wt_activity)
+    else:
+        seq, stem_pairs, motif_positions = SEQ, STEM_PAIRS, MOTIF_POSITIONS
+    L = len(seq)
     mut_counts = {pct: mut_count_for(pct, L) for pct in MUT_RATES_PCT}
-    print(f"Sequence: {SEQ}")
-    print(f"Stem pairs: {STEM_PAIRS}")
-    print(f"Motif positions: {MOTIF_POSITIONS}")
-    print(f"Instances: {N_INSTANCES}  |  L={L}  |  Pool size: {N_LARGE:,}  |  "
+    print(f"Sequence: {seq}")
+    print(f"Stem pairs: {stem_pairs}")
+    print(f"Motif positions: {motif_positions}")
+    print(f"Oracle: {oracle_name}  |  primary score: {primary_key}")
+    if use_vts1_seq:
+        print(f"VTS1 WT activity context: {wt_activity}")
+    print(f"Output base: {out_base}")
+    print(f"Instances: {n_instances}  |  L={L}  |  Pool size: {pool_size:,}  |  "
           f"Subsample sizes: {LIB_SIZES}")
     print(f"Mutation counts: { {p: f'{c} ({c/L*100:.1f}%)' for p, c in mut_counts.items()} }\n")
 
     for k in range(n_instances):
-        inst_dir = os.path.join(OUT_BASE, f"instance_{k:02d}")
+        inst_dir = os.path.join(out_base, f"instance_{k:02d}")
         os.makedirs(inst_dir, exist_ok=True)
         t_inst = time.time()
+        wt_seq_path = os.path.join(inst_dir, "wt_seq.txt")
+        force_regen = False
+        if os.path.exists(wt_seq_path):
+            with open(wt_seq_path) as f:
+                saved_seq = f.read().strip()
+            force_regen = saved_seq != seq
+            if force_regen:
+                print(f"[instance {k:02d}]  existing wt_seq differs; regenerating native {oracle_name} libraries")
 
-        with open(os.path.join(inst_dir, "wt_seq.txt"), "w") as f:
-            f.write(SEQ + "\n")
+        with open(wt_seq_path, "w") as f:
+            f.write(seq + "\n")
 
         # ── GT: reconstruct deterministically from seed=k ──────────────────
-        gt           = MrnaRbpGroundTruth(SEQ, STEM_PAIRS, MOTIF_POSITIONS, seed=k,
-                                          stem_sigma=STEM_SIGMA)
+        gt = build_oracle(
+            oracle_name,
+            seq=seq,
+            stem_pairs=stem_pairs,
+            motif_positions=motif_positions,
+            seed=k,
+            stem_sigma=STEM_SIGMA,
+            residualbind_dir=residualbind_dir,
+        )
         wt_oh        = gt.wt_one_hot()
         gt_params_path = os.path.join(inst_dir, "gt_params.npz")
 
-        if not os.path.exists(gt_params_path):
+        if force_regen or not os.path.exists(gt_params_path):
             np.savez_compressed(
                 gt_params_path,
-                alpha   = gt.alpha,
+                alpha   = getattr(gt, "alpha", np.empty((0, 4), dtype=np.float32)),
                 edges   = gt.edges,
-                W_mut   = gt._W_mut,
-                mut_map = gt._mut_map,
-                J       = gt._J,
+                W_mut   = getattr(gt, "_W_mut", np.empty((0, 3), dtype=np.float32)),
+                mut_map = getattr(gt, "_mut_map", np.empty((0, 3), dtype=np.int32)),
+                J       = getattr(gt, "_J", np.empty((0, 0, 4, 4), dtype=np.float32)),
                 seed    = np.array([k]),
+                oracle  = np.array([oracle_name]),
+                wt_activity = np.array([wt_activity if use_vts1_seq else "default"]),
+                wt_seq  = np.array(seq),
             )
-            print(f"[instance {k:02d}]  saved gt_params  stem_pairs={len(STEM_PAIRS)}")
+            print(f"[instance {k:02d}]  saved gt_params  stem_pairs={len(stem_pairs)}")
         else:
             print(f"[instance {k:02d}]  gt_params exists — skip save")
 
         # ── SSM ─────────────────────────────────────────────────────────────
         ssm_path = os.path.join(inst_dir, "ssm.npz")
-        if not os.path.exists(ssm_path):
+        if force_regen or not os.path.exists(ssm_path):
             ssm_ids    = generate_ssm(wt_oh)
             X_ssm      = np.eye(4, dtype=np.float32)[ssm_ids]
             ssm_scores = gt.score_all(X_ssm)
-            save_npz(ssm_path, ssm_ids, ssm_scores, gt.edges)
-            print(f"           ssm saved  nonlin_add_pair ∈ "
-                  f"[{ssm_scores['nonlin_additive_pairwise'].min():.4f}, "
-                  f"{ssm_scores['nonlin_additive_pairwise'].max():.4f}]")
+            wt_scores = gt.score_all(wt_oh[None, :, :])
+            wt_extra = {
+                f"wt_score_{key}": np.array([float(wt_scores[key][0])], dtype=np.float32)
+                for key in gt_keys
+            }
+            save_npz(ssm_path, ssm_ids, ssm_scores, gt.edges, gt_keys, extra=wt_extra)
+            print(f"           ssm saved  {primary_key} ∈ "
+                  f"[{ssm_scores[primary_key].min():.4f}, "
+                  f"{ssm_scores[primary_key].max():.4f}]")
         else:
             print(f"           ssm already exists — skip")
 
@@ -392,24 +487,24 @@ def run_pipeline(n_instances: int = N_INSTANCES, pool_size: int = N_LARGE):
             t_r = time.time()
 
             pool_path    = os.path.join(mut_dir, "pool_2M.npz")
-            missing_rand = _missing_lib_sizes(mut_dir)
+            missing_rand = LIB_SIZES if force_regen else _missing_lib_sizes(mut_dir)
 
-            if not missing_rand and os.path.exists(pool_path):
+            if not force_regen and not missing_rand and os.path.exists(pool_path):
                 print(f"  mut{pct:02d}%  all libs present — skip")
                 continue
 
             # ── Load or generate pool
-            if os.path.exists(pool_path):
+            if not force_regen and os.path.exists(pool_path):
                 d           = np.load(pool_path)
                 nuc_ids     = d["nuc_ids"]
-                pool_scores = {key: d[f"scores_{key}"] for key in GT_KEYS}
+                pool_scores = {key: d[f"scores_{key}"] for key in gt_keys}
                 print(f"  mut{pct:02d}%  loaded pool  missing libs={missing_rand}")
             else:
                 rng_lib = np.random.default_rng(k * 1000 + 200 + r_idx * 10)
                 nuc_ids = generate_pool(wt_oh, pool_size, mc, rng_lib)
                 nuc_ids = np.unique(nuc_ids, axis=0)   # deduplicate
-                pool_scores = score_pool(nuc_ids, gt)
-                save_npz(pool_path, nuc_ids, pool_scores, gt.edges)
+                pool_scores = score_pool(nuc_ids, gt, gt_keys)
+                save_npz(pool_path, nuc_ids, pool_scores, gt.edges, gt_keys)
                 print(f"  mut{pct:02d}%  pool generated  unique={len(nuc_ids):,}")
 
             # ── Random subsamples
@@ -423,14 +518,15 @@ def run_pipeline(n_instances: int = N_INSTANCES, pool_size: int = N_LARGE):
                     lib_path = os.path.join(mut_dir, f"lib_{n_sub}.npz")
                     if n_sub in missing_rand:
                         save_npz(lib_path, nuc_ids[idx[:n_draw]],
-                                 {key: pool_scores[key][idx] for key in GT_KEYS}, gt.edges)
+                                 {key: pool_scores[key][idx] for key in gt_keys},
+                                 gt.edges, gt_keys)
 
             del nuc_ids, pool_scores
             print(f"  mut{pct:02d}%  done  ({time.time()-t_r:.1f}s)")
 
-        # ── Type1 / Type2 eval libs + pairwise structured lib
-        generate_type1_type2(k, inst_dir, gt)
-        generate_pairwise_lib(k, inst_dir, gt)
+        # ── Type1 / activity-balanced eval libs + pairwise structured lib
+        generate_type1_activity_balanced(k, inst_dir, gt, out_base, gt_keys, primary_key, force=force_regen)
+        generate_pairwise_lib(k, inst_dir, gt, gt_keys, primary_key, force=force_regen)
 
         print(f"  → instance {k:02d} done  ({time.time()-t_inst:.1f}s)\n")
 
@@ -473,5 +569,18 @@ if __name__ == "__main__":
                     help="Number of GT instances to generate (default: all)")
     _p.add_argument("--pool_size", type=int, default=N_LARGE,
                     help="Pool size per (instance, mut_rate) (default: 2M)")
+    _p.add_argument("--oracle", default=MRNA_ORACLE,
+                    choices=[MRNA_ORACLE, "mrna", "residualbind", "residualbind_ensemble",
+                                 "residualbind_msi1", "vts1", "residualbind_vts1"],
+                    help="Oracle to score libraries with")
+    _p.add_argument("--out_base", default=None,
+                    help="Output directory. Defaults to outputs or outputs_<oracle>")
+    _p.add_argument("--residualbind_dir", default=None,
+                    help="Directory containing ResidualBind ensemble member*.pt checkpoints")
+    _p.add_argument("--wt_activity", choices=["high", "low"], default="high",
+                    help="VTS1 ResidualBind WT sequence context used for natural random-library distributions")
     _args = _p.parse_args()
-    run_pipeline(n_instances=_args.n_instances, pool_size=_args.pool_size)
+    run_pipeline(n_instances=_args.n_instances, pool_size=_args.pool_size,
+                 oracle_name=_args.oracle, out_base=_args.out_base,
+                 residualbind_dir=_args.residualbind_dir,
+                 wt_activity=_args.wt_activity)

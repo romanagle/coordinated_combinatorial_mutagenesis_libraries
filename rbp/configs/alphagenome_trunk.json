@@ -1,0 +1,36 @@
+{
+  "model": "alphagenome_ft",
+  "data": {
+    "sequence_length": 48,
+    "normalization": "log_norm",
+    "batch_size": 100,
+    "num_workers": 4
+  },
+  "model_args": {
+    "pretrained_weights": null,
+    "feature_stage": null,
+    "pooling_type": "flatten",
+    "hidden_sizes": [
+      1024
+    ],
+    "dropout": 0.1,
+    "activation": "relu"
+  },
+  "stages": [
+    {
+      "trainable": "head",
+      "lr": 0.001,
+      "weight_decay": 1e-06,
+      "num_epochs": 100,
+      "patience": 10
+    },
+    {
+      "trainable": "all",
+      "lr": 1e-05,
+      "weight_decay": 1e-06,
+      "num_epochs": 50,
+      "patience": 10
+    }
+  ],
+  "seed": 43
+}
