@@ -10,6 +10,8 @@
 ## Current status
 
 - A draft manuscript structure with embedded figures and refined interpretation notes is available at `mRNA_RBP/NARRATIVE.md`.
+- Narrative snapshot: [[Artifacts/random_lib_mutagenesis/2026-08-03_narrative_map]].
+- Hole review is paused at Section 3's targeted-pairwise library design.
 - Preferred library-size layout is the three-landscape triptych.
 - Preferred evaluation-library layout is Variant B without saturated additive-plus-pairwise.
 
@@ -39,6 +41,8 @@
 - Does targeted-pairwise recovery persist when mutation order increases through the complete stem?
 
 ## Next milestone
+
+- Resume hole review by deciding whether targeted-pairwise mutation orders should be stratified or pooled.
 
 ## Future directions
 
