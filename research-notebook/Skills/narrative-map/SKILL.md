@@ -4,7 +4,7 @@ description: Build a manuscript's narrative structure from your existing analyse
 disable-model-invocation: true
 ---
 
-A manuscript is a fixed shape: a **question**, the **methods** that answer it, and **results** broken into subsections, each arguing one subpoint off a specific graph. An analysis either has a section to live in, or it doesn't — one that doesn't is a **rabbit hole**, interesting in the moment but not part of the manuscript. A subsection with no analysis behind it yet is a **hole**. Naming these turns a pile of graphs into a structure you can keep coming back to.
+A manuscript is a fixed shape: a **question**, the **methods** that answer it, and **results** broken into subsections, each arguing one subpoint off a specific graph. An analysis either has a section to live in, or it belongs under **Revisit** until its role is resolved. A subsection with no analysis behind it yet is a **hole**. Naming these turns a pile of graphs into a structure you can keep coming back to.
 
 **Interpretation is never yours to supply.** For every graph, ask what it shows and record the user's own words. You propose structure; the user owns every claim about what the data means.
 
@@ -46,7 +46,7 @@ State lives in `NARRATIVE.md` at the project root, created once the question is 
 
 - <subsection>: <what's missing, specific enough to know when it's filled>
 
-## Rabbit holes
+## Revisit
 
 - [<graph>](path) — <why it has no section; disposal: parked / cut / promoted to a new subsection>
 ```
@@ -63,7 +63,7 @@ State lives in `NARRATIVE.md` at the project root, created once the question is 
 
 5. **Tweak until it holds.** Grill on the proposal one question at a time — reorder, split, merge, rename — per `/grilling`'s rule: don't lock it in until the user confirms shared understanding.
 
-6. **Recognize the holes.** Any subsection with no supporting graph is a hole — list it. Any inventoried graph that never found a subsection is a rabbit hole — list it and ask the user to dispose of it: fold in, promote to a new subsection, or park it. Done when every subsection has a graph or a hole entry, and every inventoried graph is placed or in rabbit holes.
+6. **Recognize the holes.** Any subsection with no supporting graph is a hole — list it. Put any inventoried graph without a settled subsection under Revisit and ask whether to fold it in, promote it, park it, or cut it. Done when every subsection has a graph or a hole entry, and every inventoried graph is placed or listed under Revisit.
 
 7. Write `NARRATIVE.md`.
 
@@ -72,8 +72,8 @@ State lives in `NARRATIVE.md` at the project root, created once the question is 
 The file is the guiding light from here on — check new work against it before anything else. Whenever the user brings a new analysis, whether it targets a listed hole or came from somewhere else entirely:
 
 1. Ask what it shows; record their words.
-2. Check it against the structure: does it close a hole, support an existing subsection, or fit nowhere? A fit-nowhere graph is a rabbit hole — ask for its disposal.
-3. Update `NARRATIVE.md` — move it out of Holes, add it under its subsection, or log it under Rabbit holes.
+2. Check it against the structure: does it close a hole, support an existing subsection, or lack a settled role? Put an unresolved graph under Revisit and ask for its disposition.
+3. Update `NARRATIVE.md` — move it out of Holes, add it under its subsection, or log it under Revisit.
 4. If the new analysis reveals a subsection the structure was missing, add it and note whether it opens fresh holes of its own.
 
 ## Report

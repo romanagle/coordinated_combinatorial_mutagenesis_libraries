@@ -89,7 +89,7 @@
 - Higher-order recovery: measure what sequence-function signal saturated singles and doubles cannot capture, especially in VTS1.
 - Coefficient recovery: resolve the unexpectedly high Synthetic GT pairwise cosine similarity before using coefficient agreement.
 
-## Rabbit holes
+## Revisit
 
 - Low-WT activity distributions are parked for the supplement unless they establish stronger mutation-rate-dependent skew than high-WT controls.
 - Full coefficient maps are cut; cosine similarity is the preferred coefficient-agreement summary.
