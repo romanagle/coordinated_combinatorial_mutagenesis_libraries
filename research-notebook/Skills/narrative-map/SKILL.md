@@ -4,7 +4,7 @@ description: Build a manuscript's narrative structure from your existing analyse
 disable-model-invocation: true
 ---
 
-A manuscript is a fixed shape: a **question**, the **methods** that answer it, and **results** broken into subsections, each arguing one subpoint off a specific graph. An analysis either has a section to live in, or it belongs under **Revisit** until its role is resolved. A subsection with no analysis behind it yet is a **hole**. Naming these turns a pile of graphs into a structure you can keep coming back to.
+A manuscript is a fixed shape: a **question**, the **methods** that answer it, **results** broken into subsections, each arguing one subpoint off a specific graph, a **discussion** and **conclusion** that accumulate only after themes emerge from the results, and a **supplement** for supporting analyses that have a settled role outside the main argument. An analysis either has a main-text or supplement section to live in, or it belongs under **Revisit** until its role is resolved. A subsection with no analysis behind it yet is a **hole**. Naming these turns a pile of graphs into a structure you can keep coming back to.
 
 **Interpretation is never yours to supply.** For every graph, ask what it shows and record the user's own words. You propose structure; the user owns every claim about what the data means.
 
@@ -42,9 +42,21 @@ State lives in `NARRATIVE.md` at the project root, created once the question is 
 
 - [<graph>](path) — <the user's own words on what it shows>
 
+## Discussion
+
+## Conclusion
+
 ## Holes
 
 - <subsection>: <what's missing, specific enough to know when it's filled>
+
+## Supplement
+
+### <supplementary subsection — one supporting subpoint>
+
+<one sentence: the supporting claim this subsection makes>
+
+- [<graph>](path) — <the user's own words on what it shows>
 
 ## Revisit
 
@@ -59,11 +71,11 @@ State lives in `NARRATIVE.md` at the project root, created once the question is 
 
 3. **Prototype figure presentation.** Once every selected analysis has the user's interpretation, build throwaway prototypes of clearer graph designs and figure groupings that serve those messages. Present each suggestion through its linked prototype, not prose alone. Do not create or offer redesigns earlier.
 
-4. **Propose a structure.** From the question and the inventory, draft a Methods list and a Results outline — subsections, each one subpoint, each grounded in specific graphs already inventoried. This is your proposal to react to, not a final answer.
+4. **Propose a structure.** From the question and the inventory, draft a Methods list, a Results outline, and a Supplement outline — subsections, each one subpoint, each grounded in specific graphs already inventoried. Add empty Discussion and Conclusion headings; populate them only when the user identifies themes supported by the Results structure. The supplement supports the manuscript but does not carry a necessary step in the main argument. This is your proposal to react to, not a final answer.
 
 5. **Tweak until it holds.** Grill on the proposal one question at a time — reorder, split, merge, rename — per `/grilling`'s rule: don't lock it in until the user confirms shared understanding.
 
-6. **Recognize the holes.** Any subsection with no supporting graph is a hole — list it. Put any inventoried graph without a settled subsection under Revisit and ask whether to fold it in, promote it, park it, or cut it. Done when every subsection has a graph or a hole entry, and every inventoried graph is placed or listed under Revisit.
+6. **Recognize the holes.** Any subsection with no supporting graph is a hole — list it. Put any inventoried graph without a settled main-text or supplement subsection under Revisit and ask whether to fold it into the main text, place it in the supplement, promote it to a new subsection, park it, or cut it. Done when every subsection has a graph or a hole entry, and every inventoried graph is placed or listed under Revisit.
 
 7. Write `NARRATIVE.md`.
 
@@ -72,10 +84,11 @@ State lives in `NARRATIVE.md` at the project root, created once the question is 
 The file is the guiding light from here on — check new work against it before anything else. Whenever the user brings a new analysis, whether it targets a listed hole or came from somewhere else entirely:
 
 1. Ask what it shows; record their words.
-2. Check it against the structure: does it close a hole, support an existing subsection, or lack a settled role? Put an unresolved graph under Revisit and ask for its disposition.
-3. Update `NARRATIVE.md` — move it out of Holes, add it under its subsection, or log it under Revisit.
+2. Check it against the structure: does it close a hole, support an existing main-text or supplement subsection, or lack a settled role? Put an unresolved graph under Revisit and ask for its disposition.
+3. Update `NARRATIVE.md` — move it out of Holes, add it under its main-text or supplement subsection, or log it under Revisit.
 4. If the new analysis reveals a subsection the structure was missing, add it and note whether it opens fresh holes of its own.
+5. When the user identifies a broader implication, limitation, or takeaway grounded in the developing Results structure, add it as a bullet under Discussion or Conclusion in the user's own words.
 
 ## Report
 
-Close with the Results outline, each subsection marked supported or holed, so the user sees the manuscript's shape and what's still missing at a glance.
+Close with the Results and Supplement outlines, each subsection marked supported or holed, so the user sees the manuscript's shape and what's still missing at a glance.

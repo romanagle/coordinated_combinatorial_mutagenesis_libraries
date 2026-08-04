@@ -27,6 +27,7 @@ SYSTEMS = [
         ROOT / "outputs/ground_truth_collections/deepSQUID HuR/libraries_used_for_figures/lib_size_spearman_results_high.json",
     ),
 ]
+TRIPTYCH_ORDER = ["HuR", "Synthetic GT", "VTS1"]
 COLORS = {"Random holdout": "#3166A8", "Uniform evaluation": "#E27A3F"}
 
 
@@ -60,7 +61,7 @@ def variant_a(data):
     """Classic small multiples: trends and uncertainty are primary."""
     fig, axes = plt.subplots(1, 3, figsize=(10.4, 3.7), sharex=True, sharey=True)
     x = np.arange(3)
-    for ax, (system, _) in zip(axes, SYSTEMS):
+    for ax, system in zip(axes, TRIPTYCH_ORDER):
         for label, values in data[system].items():
             means = np.array([v.mean() for v in values])
             sds = np.array([v.std(ddof=1) if len(v) > 1 else np.nan for v in values])
@@ -158,6 +159,140 @@ def variant_c(data):
     plt.close(fig)
 
 
+def variant_d(data):
+    """Triptych with the 20K random-minus-uniform Spearman gap annotated."""
+    fig, axes = plt.subplots(1, 3, figsize=(10.4, 3.7), sharex=True, sharey=True)
+    x = np.arange(3)
+    for ax, system in zip(axes, TRIPTYCH_ORDER):
+        means_by_label = {}
+        for label, values in data[system].items():
+            means = np.array([v.mean() for v in values])
+            means_by_label[label] = means
+            sds = np.array([v.std(ddof=1) if len(v) > 1 else np.nan for v in values])
+            ax.plot(x, means, color=COLORS[label], marker="o", lw=2.2, ms=6, label=label)
+            if np.isfinite(sds).any():
+                ax.fill_between(x, means - sds, means + sds, color=COLORS[label], alpha=0.13, linewidth=0)
+        delta = means_by_label["Random holdout"][-1] - means_by_label["Uniform evaluation"][-1]
+        ax.annotate(
+            f"20K Δρ = {delta:.2f}",
+            xy=(2, means_by_label["Uniform evaluation"][-1]),
+            xytext=(-8, -24),
+            textcoords="offset points",
+            ha="right",
+            va="top",
+            fontsize=9,
+            fontweight="bold",
+            bbox={"facecolor": "white", "edgecolor": "#BBBBBB", "boxstyle": "round,pad=0.25"},
+        )
+        ax.set_title(system)
+        ax.set_xticks(x, ["200", "2K", "20K"])
+        ax.set_ylim(0, 1.04)
+        ax.grid(axis="y", color="#D8D8D8", lw=0.7, alpha=0.75)
+        ax.set_xlabel("Training library size")
+    axes[0].set_ylabel("Spearman ρ")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", ncol=2, frameon=False, bbox_to_anchor=(0.5, 1.01))
+    fig.suptitle("Evaluation regime changes the apparent recovery of model behavior", y=1.10, fontsize=13, fontweight="bold")
+    fig.text(0.5, -0.02, "Δρ = random holdout − uniform evaluation · nonlinear additive + pairwise · 10% mutation rate", ha="center", color="#555555")
+    fig.tight_layout()
+    fig.savefig(OUT / "variant_d_triptych_annotated_delta.png", dpi=220, bbox_inches="tight")
+    plt.close(fig)
+
+
+def variant_e(data):
+    """Compact table of the 20K means and random-minus-uniform gap."""
+    rows = []
+    for system in TRIPTYCH_ORDER:
+        random_mean = data[system]["Random holdout"][-1].mean()
+        uniform_mean = data[system]["Uniform evaluation"][-1].mean()
+        rows.append([system, f"{random_mean:.2f}", f"{uniform_mean:.2f}", f"{random_mean - uniform_mean:.2f}"])
+    fig, ax = plt.subplots(figsize=(7.2, 2.5))
+    ax.axis("off")
+    table = ax.table(
+        cellText=rows,
+        colLabels=["Landscape", "Random holdout ρ", "Uniform evaluation ρ", "Δρ"],
+        cellLoc="center",
+        colLoc="center",
+        loc="center",
+    )
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.scale(1, 1.55)
+    for col in range(4):
+        table[(0, col)].set_facecolor("#EAEAEA")
+        table[(0, col)].set_text_props(fontweight="bold")
+    ax.set_title("Evaluation gap at 20K training variants", fontsize=13, fontweight="bold", pad=14)
+    fig.text(0.5, 0.03, "Δρ = random holdout − uniform evaluation · means across initializations", ha="center", color="#555555")
+    fig.tight_layout()
+    fig.savefig(OUT / "variant_e_20k_delta_table.png", dpi=220, bbox_inches="tight")
+    plt.close(fig)
+
+
+def variant_f(data):
+    """Biological application only: HuR negative control and VTS1."""
+    biological_order = ["HuR", "VTS1"]
+    fig, axes = plt.subplots(1, 2, figsize=(7.8, 3.8), sharex=True, sharey=True)
+    x = np.arange(3)
+    for ax, system in zip(axes, biological_order):
+        for label, values in data[system].items():
+            means = np.array([v.mean() for v in values])
+            sds = np.array([v.std(ddof=1) if len(v) > 1 else np.nan for v in values])
+            ax.plot(x, means, color=COLORS[label], marker="o", lw=2.2, ms=6, label=label)
+            if np.isfinite(sds).any():
+                ax.fill_between(x, means - sds, means + sds, color=COLORS[label], alpha=0.13, linewidth=0)
+        ax.set_title(system)
+        ax.set_xticks(x, ["200", "2K", "20K"])
+        ax.set_ylim(0, 1.04)
+        ax.grid(axis="y", color="#D8D8D8", lw=0.7, alpha=0.75)
+        ax.set_xlabel("Training library size")
+    axes[0].set_ylabel("Spearman ρ")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", ncol=2, frameon=False, bbox_to_anchor=(0.5, 1.01))
+    fig.suptitle("Biological landscapes recreate evaluation-dependent accuracy inflation", y=1.10, fontsize=13, fontweight="bold")
+    fig.text(0.5, -0.02, "Nonlinear additive + pairwise surrogate · 10% mutation rate", ha="center", color="#555555")
+    fig.tight_layout()
+    fig.savefig(OUT / "variant_f_biological_pair.png", dpi=220, bbox_inches="tight")
+    plt.close(fig)
+
+
+def variant_g(data):
+    """Biological pair with the uniform-evaluation saturated SSM baseline."""
+    biological_order = ["HuR", "VTS1"]
+    path_by_system = {name: path for name, path in SYSTEMS}
+    ssm_baselines = {}
+    for system in biological_order:
+        cache = json.loads(path_by_system[system].read_text())
+        instance_zero = cache["saturated"]["0"]
+        oracle_block = next(iter(instance_zero.values()))
+        ssm_baselines[system] = float(oracle_block["type2"])
+
+    fig, axes = plt.subplots(1, 2, figsize=(7.8, 3.8), sharex=True, sharey=True)
+    x = np.arange(3)
+    for ax, system in zip(axes, biological_order):
+        for label, values in data[system].items():
+            means = np.array([v.mean() for v in values])
+            sds = np.array([v.std(ddof=1) if len(v) > 1 else np.nan for v in values])
+            ax.plot(x, means, color=COLORS[label], marker="o", lw=2.2, ms=6, label=label)
+            if np.isfinite(sds).any():
+                ax.fill_between(x, means - sds, means + sds, color=COLORS[label], alpha=0.13, linewidth=0)
+        baseline = ssm_baselines[system]
+        ax.axhline(baseline, color="#39845A", linestyle="--", linewidth=2.0, label="SSM baseline")
+        ax.text(0.03, baseline + 0.025, f"SSM ρ = {baseline:.2f}", color="#286A46", fontsize=9, fontweight="bold")
+        ax.set_title(system)
+        ax.set_xticks(x, ["200", "2K", "20K"])
+        ax.set_ylim(0, 1.04)
+        ax.grid(axis="y", color="#D8D8D8", lw=0.7, alpha=0.75)
+        ax.set_xlabel("Training library size")
+    axes[0].set_ylabel("Spearman ρ")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.01))
+    fig.suptitle("Biological landscapes recreate evaluation-dependent accuracy inflation", y=1.10, fontsize=13, fontweight="bold")
+    fig.text(0.5, -0.02, "SSM baseline uses uniform evaluation · nonlinear additive + pairwise surrogate at 10% mutation rate", ha="center", color="#555555")
+    fig.tight_layout()
+    fig.savefig(OUT / "variant_g_biological_pair_with_ssm.png", dpi=220, bbox_inches="tight")
+    plt.close(fig)
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     base_style()
@@ -165,6 +300,10 @@ def main():
     variant_a(data)
     variant_b(data)
     variant_c(data)
+    variant_d(data)
+    variant_e(data)
+    variant_f(data)
+    variant_g(data)
     print("Wrote:")
     for path in sorted(OUT.glob("variant_*.png")):
         print(path)
