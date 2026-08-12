@@ -50,16 +50,16 @@
 - The matched skew of the random training and test libraries is expected to produce high random-holdout accuracy without probing the entire sequence–function landscape.
 - Uniform evaluation should therefore assess recovery of the underlying sequence–function relationship more accurately than a random holdout drawn from the training distribution.
 
-![Placeholder for negative-control and existing Synthetic GT activity distributions](<prototypes/synthetic_gt_distribution_figure/outputs/synthetic_gt_distribution_placeholder.png>)
+![Positive- and negative-control Synthetic GT additive and pairwise coefficients alongside activity distributions for model-development, held-out random-test, and activity-balanced evaluation libraries](<prototypes/synthetic_gt_distribution_figure/outputs/synthetic_gt_activity_distributions.png>)
 
 #### 2. Random-holdout accuracy can conceal poor landscape-wide recovery
 
-- In the expected negative control, random-library and uniform-holdout predictions both follow the diagonal and produce high Spearman correlation coefficients.
-- In the existing Synthetic GT, random-library holdout predictions are expected to follow the diagonal only within the densely sampled lower-left region, producing a high Spearman correlation coefficient over a narrow activity range.
-- Uniform-holdout sequences span the activity grid, while their predictions are expected to depart from the diagonal and produce a low Spearman correlation coefficient.
-- This contrast would show that high random-holdout accuracy can reflect recovery of a skewed region rather than understanding of the full sequence–function landscape.
+- Both Synthetic GTs produce nearly perfect random-library holdout correlations for the 10% mutation, 20K training condition (structured positive control: Spearman ρ = 0.989; unstructured negative control: ρ = 1.000).
+- Activity-balanced evaluation sharply reduces recovery in both landscapes (structured positive control: ρ = 0.315; unstructured negative control: ρ = 0.379).
+- The structured Synthetic GT predictions compress over the broader activity-balanced range, whereas the unstructured control shows mutation-count-stratified departures from the diagonal.
+- Contrary to the expected result, removing privileged motif/stem structure does not produce high activity-balanced recovery; the current unstructured Synthetic GT therefore does not validate the intended negative-control contrast and requires redesign or reinterpretation.
 
-![Simulated placeholder for expected negative-control and Synthetic GT holdout behavior](<prototypes/synthetic_gt_scatter_expectation/outputs/synthetic_gt_scatter_expectation.png>)
+![Actual positive- and negative-control Synthetic GT predictions on matched random-library holdout and activity-balanced evaluation sets](<prototypes/synthetic_gt_scatter_expectation/outputs/synthetic_gt_scatter_actual.png>)
 
 #### 3. Random-holdout accuracy can mask model misspecification
 
@@ -114,9 +114,9 @@
 - HuR predictions remain close to the diagonal, whereas VTS1 predictions depart strongly from it.
 - VTS1 can underpredict lower-Hamming-distance variants and overpredict higher-Hamming-distance variants.
 - Mutation-count striations are reproducible visual structure but do not yet have a mechanistic interpretation.
-- The paired scatterplots should appear once; mutation-specific Spearman values carry the quantitative comparison elsewhere.
+- Standardized activity-score residual distributions replace the paired scatterplots as the mutation-count-resolved view of overprediction and underprediction.
 
-![Preferred HuR and VTS1 scatterplot pair](<prototypes/scatter_pair_figure/variant_a_clean_pair.png>)
+![HuR and VTS1 standardized activity-score residual distributions by mutation count](<prototypes/activity_balanced_failure_bars/outputs/variant_o_standardized_residual_violins.png>)
 
 ![Synthetic GT mutation-rate transfer](<outputs/ground_truth_collections/Synthetic GT/figures/mutation_rate_sweep/synthetic_gt_cross_mutrate_heatmap.png>)
 
