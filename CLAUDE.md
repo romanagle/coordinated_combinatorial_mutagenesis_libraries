@@ -114,6 +114,42 @@ mRNA_RBP/outputs/
   notebook_plots/           # all output figures
 ```
 
+## Workspace hygiene
+
+This repo has repeatedly accumulated clutter (duplicate top-level docs,
+near-duplicate scripts, multiple abandoned figure versions). Applies to any
+agent working in this repo (Claude Code, Codex, etc.):
+
+- **Don't create a new script if an existing one already does this.** Before
+  adding a script, check `mRNA_RBP/scripts/pipeline/`, `scripts/figures/core/`,
+  `scripts/maintenance/`, and `mRNA_RBP/src/` for something that already
+  covers it, and extend/parameterize that instead of adding a near-duplicate
+  (e.g. `oracles.py` is oracle-agnostic by design specifically so per-oracle
+  scripts never need to be forked). One-off exploratory scripts belong in
+  `scripts/experiments/` (with result notes in `experiments/`, per the module
+  map above) — not scattered at the repo root or copied into a new location
+  per experiment. Delete a one-off once its result is captured; don't leave
+  it in the tree as dead weight.
+- **No duplicate figure versions.** One canonical file per figure: regenerate
+  and overwrite it in place rather than saving `_v2`/`_final`/`_new`-suffixed
+  siblings, and don't emit the same figure in multiple formats (png + pdf +
+  svg) unless a specific downstream consumer actually needs the second
+  format. Variant iteration (`variant_a`, `variant_b`, ...) is only for
+  active exploration inside `mRNA_RBP/prototypes/<name>/outputs/` — once a
+  variant is accepted into `NARRATIVE.md`, the rejected variants and any
+  intermediate copies should be cleaned up, not left sitting alongside it.
+- **Put each figure where it's supposed to live**, per Output structure
+  above: exploratory/prototype figures → `prototypes/<name>/outputs/`;
+  ad hoc pipeline plots → `outputs/notebook_plots/`; finalized manuscript
+  evidence → `outputs/ground_truth_collections/<name>/figures/<category>/`,
+  produced via `build_ground_truth_collection.py`, not hand-copied. Never
+  leave a finished figure at the repo root, in the working directory a
+  script happened to run from, or in an untracked scratch path.
+- Before adding any new top-level file or directory, check whether it
+  belongs inside an existing one (`docs/`, `experiments/`, `prototypes/`,
+  a specific `outputs/` subtree) rather than sitting loose at `mRNA_RBP/` or
+  repo root.
+
 ## Surrogate configs
 
 Four MAVE-NN configs trained per condition in `lib_size_spearman.py`:
