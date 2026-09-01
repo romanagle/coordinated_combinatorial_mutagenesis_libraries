@@ -326,6 +326,97 @@ def make_activity_distribution_grid(variants, mut_pcts=DIST_MUT_PCTS, lib_size=L
 
 
 # ---------------------------------------------------------------------------
+# Comparison row: real deepSQUID HuR (genuine single-motif biology) alongside
+# the five synthetic negative-control variants, same mutation rates.
+# Uses the already-cached instance_00 (high WT) random libraries -- no live
+# oracle scoring, no retraining.
+# ---------------------------------------------------------------------------
+
+HUR_LIB_DIR = os.path.join(_HERE, "runs", "deepsquid", "hur", "high", "instance_00")
+HUR_SCORE_KEY = "deepsquid_hur"
+
+
+def load_hur_scores(mut_pcts=DIST_MUT_PCTS):
+    """Load cached mut{pct}/lib_20000.npz deepsquid_hur scores. Returns
+    {pct: (y, n)} or {} for a pct with no cached library."""
+    out = {}
+    for pct in mut_pcts:
+        path = os.path.join(HUR_LIB_DIR, f"mut{pct:02d}", "lib_20000.npz")
+        if not os.path.exists(path):
+            print(f"  [skip] no cached HuR library at {path}")
+            continue
+        d = np.load(path)
+        key = f"scores_{HUR_SCORE_KEY}"
+        if key not in d.files:
+            print(f"  [skip] {path} has no {key}")
+            continue
+        out[pct] = d[key].astype(float)
+    return out
+
+
+def make_variant_vs_hur_grid(variants, mut_pcts=DIST_MUT_PCTS, lib_size=LIB_SIZE):
+    """(variants + 1 real HuR row) x mutation-rate grid, for direct visual
+    comparison against a genuine single-motif biological landscape."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    hur_scores = load_hur_scores(mut_pcts)
+    row_labels = [v.name for v in variants] + (["HuR_real_deepsquid (high WT)"] if hur_scores else [])
+    n_rows, n_cols = len(row_labels), len(mut_pcts)
+
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(3.6 * n_cols, 2.4 * n_rows),
+                              sharex=False, gridspec_kw={"hspace": 0.5, "wspace": 0.25})
+
+    def _panel(ax, y, title=None, ylabel=None, xlabel=None, color="#4C72B0"):
+        ax.hist(y, bins=60, color=color, alpha=0.75, edgecolor="white", linewidth=0.3)
+        ax.axvline(0.0, color="black", linewidth=1.2, linestyle="--")
+        ax.tick_params(labelsize=7)
+        if title:
+            ax.set_title(title, fontsize=10)
+        if ylabel:
+            ax.set_ylabel(ylabel, fontsize=8)
+        if xlabel:
+            ax.set_xlabel(xlabel, fontsize=8)
+
+    for row, v in enumerate(variants):
+        wt_oh = v.wt_one_hot()
+        L = wt_oh.shape[0]
+        for col, pct in enumerate(mut_pcts):
+            mut_count = max(1, round(pct * L / 100))
+            rng = np.random.default_rng(SEED * 10_000 + pct * 100 + lib_size)
+            nuc_ids = _generate_pool(wt_oh, lib_size, mut_count, rng)
+            X = np.eye(4, dtype=np.float32)[nuc_ids]
+            y = v.score_all(X)[v.score_key]
+            _panel(axes[row, col], y,
+                   title=f"{pct}% mutation rate" if row == 0 else None,
+                   ylabel=v.name if col == 0 else None)
+
+    if hur_scores:
+        hur_row = n_rows - 1
+        for col, pct in enumerate(mut_pcts):
+            if pct not in hur_scores:
+                axes[hur_row, col].text(0.5, 0.5, "no cached library", ha="center",
+                                        va="center", fontsize=8)
+                axes[hur_row, col].set_xticks([]); axes[hur_row, col].set_yticks([])
+                continue
+            y = hur_scores[pct]
+            print(f"  [hur] mut{pct}%  n={len(y)}  mean={float(np.mean(y)):+.3f}  "
+                  f"std={float(np.std(y)):.3f}")
+            _panel(axes[hur_row, col], y, ylabel=row_labels[-1] if col == 0 else None,
+                   xlabel="Activity score", color="#C44E52")
+    for col in range(n_cols):
+        axes[n_rows - 1, col].set_xlabel("Activity score", fontsize=8)
+
+    fig.suptitle("Negative-control variants vs. real deepSQUID HuR "
+                 "(random libraries)", y=1.0, fontsize=12)
+    out_path = os.path.join(OUT_DIR, "negctrl_variant_vs_hur_distributions.png")
+    fig.savefig(out_path, dpi=140, bbox_inches="tight")
+    plt.close(fig)
+    return out_path
+
+
+# ---------------------------------------------------------------------------
 # 10% mutation-rate / 20,000-sequence random-holdout Spearman rho
 # ---------------------------------------------------------------------------
 
@@ -371,9 +462,15 @@ def main():
                         help="Skip surrogate training / rho_rand (fast: only distributions/coefs)")
     parser.add_argument("--skip_dist", action="store_true",
                         help="Skip the variants x mutation-rate activity-distribution grid")
+    parser.add_argument("--hur_compare", action="store_true",
+                        help="Also build the variants-vs-real-HuR comparison grid (cached libs only)")
     args = parser.parse_args()
 
     variants = build_variants()
+
+    if args.hur_compare:
+        hur_fig = make_variant_vs_hur_grid(variants)
+        print(f"[hur] comparison figure -> {hur_fig}")
 
     if not args.skip_coef:
         coef_fig = make_coefficient_figures(variants)

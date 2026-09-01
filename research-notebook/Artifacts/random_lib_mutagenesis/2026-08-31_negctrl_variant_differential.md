@@ -72,6 +72,35 @@ saturation ceiling and becomes heavy-tailed instead of clustered. This is a visi
 difference between the variants that `rho_rand` does not surface -- worth carrying into the
 activity-balanced follow-up in Next steps below.
 
+## Comparison against real deepSQUID HuR
+
+All five synthetic variants vs. the real `deepsquid_hur` oracle (high WT, instance_00), same
+mutation rates, using already-cached random libraries (no live scoring, no retraining).
+
+![[2026-08-31_negctrl_variant_vs_hur_distributions.png]]
+
+| Mutation rate | HuR n | HuR frac. scoring above WT | HuR skewness |
+| --- | ---: | ---: | ---: |
+| 5% | 7,380 | 24.2% | 0.41 |
+| 10% | 20,000 | 17.3% | 0.83 |
+| 25% | 20,000 | 8.9% | 1.52 |
+
+None of the five synthetic variants can reproduce this at all: every synthetic variant is
+noWT-parameterized so that every mutation score is <= 0 by construction (`W_mut <= 0` for the
+additive weights, sigmoid anchored so mutations never exceed WT). Real `deepsquid_hur` has no
+such constraint -- 9-24% of randomly mutated sequences score *above* WT, and the right tail
+grows with mutation rate (skewness 0.41 -> 1.52). This is a structural gap between the whole
+synthetic-variant family and the real biological comparator, not something that differs among
+V0-V4 -- it follows directly from the `<=0`/WT-anchored invariant shared by every synthetic GT
+in this pipeline (see CLAUDE.md's "GT score invariants").
+
+This bears directly on which variant "looks like" HuR: V1's near-symmetric, unimodal shape is
+not actually closer to real HuR than V0/V2's clustered shape -- real HuR's negative-side mass
+also decays away from a peak near WT with a long left tail (structurally similar to V0/V2's
+sub-zero cluster and to V1), but its defining feature (a real right tail past WT) is absent from
+every synthetic variant equally. Picking a "most HuR-like" variant by eye isn't meaningful until
+that shared constraint is addressed.
+
 ## Tested differential
 
 | Hypothesis | Executed check | Verdict | Evidence |
@@ -111,5 +140,6 @@ activity-balanced follow-up in Next steps below.
 
 - ![[2026-08-31_negctrl_variant_differential_coefficients.png]]
 - ![[2026-08-31_negctrl_variant_activity_distributions_5x3.png]]
+- ![[2026-08-31_negctrl_variant_vs_hur_distributions.png]]
 - [Results JSON](../../../mRNA_RBP/prototypes/negctrl_variant_differential/outputs/negctrl_variant_differential_results.json)
 - [Experiment script](../../../mRNA_RBP/scripts/experiments/negctrl_variant_differential.py)
