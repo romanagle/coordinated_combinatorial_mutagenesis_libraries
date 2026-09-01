@@ -1,0 +1,73 @@
+{
+  "seed": 0,
+  "mut_pct": 10,
+  "lib_size": 20000,
+  "surrogate_config": "nonlinear additive + pairwise",
+  "variants": {
+    "V0_motif_only_current_design": {
+      "rho_rand": 0.9998071820553613,
+      "n_train": 19974,
+      "rationale": "Domain: currently registered mrna_negative_control design -- HuR-like single privileged motif, near-neutral background, no pairwise. If-true: a concentrated motif with weak background still recovers near-ceiling on random holdout. If-false: motif concentration alone depresses rho_rand.",
+      "spec": {
+        "use_motif": true,
+        "motif_sigma": 3.0,
+        "bg_sigma": 0.1,
+        "pairwise_sigma": 0.0,
+        "pairwise_p_edge": 0.0,
+        "use_nonlin": true
+      }
+    },
+    "V1_null_no_motif": {
+      "rho_rand": 0.9999754671880416,
+      "n_train": 19974,
+      "rationale": "Sampling/coverage: same weak background scale as V0 everywhere, no privileged region at all. If-true: rho_rand matches V0 (signal concentration doesn't matter for random-holdout recoverability). If-false: removing the motif changes rho_rand, implicating concentration rather than mere presence of structure.",
+      "spec": {
+        "use_motif": false,
+        "motif_sigma": 3.0,
+        "bg_sigma": 0.1,
+        "pairwise_sigma": 0.0,
+        "pairwise_p_edge": 0.0,
+        "use_nonlin": true
+      }
+    },
+    "V2_motif_plus_leaky_pairwise": {
+      "rho_rand": 0.999078526295735,
+      "n_train": 19974,
+      "rationale": "Domain (mechanism boundary): V0 plus weak, WC-compatible-but-not-stem-restricted pairwise edges at low scale/density -- recreates the original (failed) unstructured negative control's leaky topology layered on a motif-only background. If-true: even weak non-structural pairwise coupling depresses rho_rand relative to V0. If-false: a pairwise-capable surrogate absorbs it and rho_rand stays high.",
+      "spec": {
+        "use_motif": true,
+        "motif_sigma": 3.0,
+        "bg_sigma": 0.1,
+        "pairwise_sigma": 0.3,
+        "pairwise_p_edge": 0.15,
+        "use_nonlin": true
+      }
+    },
+    "V3_motif_linear_no_nonlin": {
+      "rho_rand": 0.9985299045761412,
+      "n_train": 19974,
+      "rationale": "Statistical artifact/methodological: V0 without the sigmoid squashing. If-true: removing the nonlinearity changes rho_rand relative to V0, implicating the nonlinearity itself. If-false: rho_rand is unchanged, ruling out the nonlinearity as a random-holdout recoverability factor (as opposed to activity-balanced mutation-count extrapolation, where it was already implicated separately).",
+      "spec": {
+        "use_motif": true,
+        "motif_sigma": 3.0,
+        "bg_sigma": 0.1,
+        "pairwise_sigma": 0.0,
+        "pairwise_p_edge": 0.0,
+        "use_nonlin": false
+      }
+    },
+    "V4_diffuse_moderate_background": {
+      "rho_rand": 0.9999908215217277,
+      "n_train": 19974,
+      "rationale": "Sampling/coverage: no privileged region, background scale matches the structured GT's own bg_sigma=0.5 (denser/stronger than V1). If-true: rho_rand tracks total additive signal magnitude, not concentration. If-false: rho_rand matches V0/V1 regardless of background scale.",
+      "spec": {
+        "use_motif": false,
+        "motif_sigma": 3.0,
+        "bg_sigma": 0.5,
+        "pairwise_sigma": 0.0,
+        "pairwise_p_edge": 0.0,
+        "use_nonlin": true
+      }
+    }
+  }
+}
