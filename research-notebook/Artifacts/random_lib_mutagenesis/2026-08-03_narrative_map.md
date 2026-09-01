@@ -25,7 +25,7 @@
 
 - Held-out agreement between deepSQUID and ResidualBind supports using deepSQUID as the primary oracle in subsequent experiments.
 
-![deepSQUID versus ResidualBind held-out agreement](<../../../mRNA_RBP/outputs/ground_truth_collections/deepsquid_vs_real_oracle_heldout_test_bar.png>)
+![deepSQUID versus ResidualBind held-out agreement](deepsquid_vs_real_oracle_heldout_test_bar.png)
 
 ### 2. Random-library test accuracy can overstate landscape recovery
 
@@ -35,7 +35,7 @@
 - HuR is the negative control: random and activity-balanced evaluation are both high at 20K, indicating genuine recovery for a sequence-motif landscape.
 - The contrast suggests that held-out accuracy is reliable for HuR but inflated for the more complex Synthetic GT and VTS1 landscapes.
 
-![Selected library-size comparison prototype](<../../../mRNA_RBP/prototypes/library_size_figure/outputs/variant_a_triptych.png>)
+![Selected library-size comparison prototype](variant_a_triptych.png)
 
 ### 3. Evaluation-library choice changes the apparent success of the same surrogate
 
@@ -44,7 +44,7 @@
 - Current targeted-pairwise VTS1 recovery is unexpectedly high and is not yet trusted.
 - Saturated additive-plus-pairwise evaluation is omitted until its unique purpose is clarified.
 
-![Preferred evaluation-library comparison prototype](<../../../mRNA_RBP/prototypes/library_roles_figure/variant_b_mutation_order.png>)
+![Preferred evaluation-library comparison prototype](variant_b_mutation_order.png)
 
 ### 4. Mutation-rate mismatch exposes incomplete train-test generalization
 
@@ -53,11 +53,11 @@
 - The effect disappears for HuR, provisionally linking the mismatch to landscape complexity.
 - The SSM row and the quantitative size of the cross-landscape difference remain unresolved.
 
-![Synthetic GT mutation-rate transfer](<../../../mRNA_RBP/outputs/ground_truth_collections/Synthetic GT/figures/mutation_rate_sweep/synthetic_gt_cross_mutrate_heatmap.png>)
+![Synthetic GT mutation-rate transfer](synthetic_gt_cross_mutrate_heatmap.png)
 
-![VTS1 mutation-rate transfer](<../../../mRNA_RBP/outputs/ground_truth_collections/deepSQUID VTS1/figures/mutation_rate_sweep/deepsquid_vts1_cross_mutrate_heatmap_high.png>)
+![VTS1 mutation-rate transfer](deepsquid_vts1_cross_mutrate_heatmap_high.png)
 
-![HuR mutation-rate transfer](<../../../mRNA_RBP/outputs/ground_truth_collections/deepSQUID HuR/figures/mutation_rate_sweep/deepsquid_hur_cross_mutrate_heatmap_high.png>)
+![HuR mutation-rate transfer](deepsquid_hur_cross_mutrate_heatmap_high.png)
 
 ### 5. Prediction errors depend systematically on mutation count
 
@@ -66,7 +66,7 @@
 - Mutation-count striations are reproducible visual structure but do not yet have a mechanistic interpretation.
 - The paired scatterplots should appear once; mutation-specific Spearman values carry the quantitative comparison elsewhere.
 
-![Preferred HuR and VTS1 scatterplot pair](<../../../mRNA_RBP/prototypes/scatter_pair_figure/variant_a_clean_pair.png>)
+![Preferred HuR and VTS1 scatterplot pair](variant_a_clean_pair.png)
 
 ### 6. Random-library activity distributions may explain biased recovery
 
@@ -74,7 +74,7 @@
 - The current VTS1 example confounds motif disruption with stem disruption because its motif lies inside the stem.
 - A new landscape with non-overlapping motif and stem regions is required before assigning the mechanism.
 
-![Blocked paired-distribution prototype](<../../../mRNA_RBP/prototypes/distribution_pair_figure/variant_a_paired_ridgelines.png>)
+![Blocked paired-distribution prototype](variant_a_paired_ridgelines.png)
 
 ## Holes
 

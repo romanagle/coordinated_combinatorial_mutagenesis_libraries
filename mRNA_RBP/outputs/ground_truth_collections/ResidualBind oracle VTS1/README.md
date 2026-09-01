@@ -1,31 +1,15 @@
 # ResidualBind oracle VTS1
 
-Figures are in `figures/`; copied cache/model/weight artifacts are in `cached_libraries/`. The source pipeline workspace for this GT is contained in `pipeline_workspace/`. The manifest records every file included in the curated collection.
+Figures are in `figures/`; copied cache/model/weight artifacts are in `libraries_used_for_figures/`. Built end-to-end by `mRNA_RBP/scripts/pipeline/build_ground_truth_collection.py --oracle vts1_residualbind`. The manifest records every file included.
 
-- Figures copied in manifest: `11`
-- Cached artifacts copied in manifest: `131`
-- Missing source files: `0`
+- Figures: `27`
+- Cached artifacts: `103`
 
-## WT Sequence Contexts
+## Coefficient similarity (GT/oracle vs surrogate)
 
-- High-WT random-library figure: `rand_lib_dist_vts1_oracle_region_classes.png`
-  uses `AAGGACACUAAGUACAGGUUGCUGGCACAGGGCGCUCAUAA`.
-- Low-WT random-library figure: `rand_lib_dist_vts1_oracle_region_classes_low_wt.png`
-  uses `AAAAGAUGGCUAUGCGACCCGCUGGAACUAGUAAGUGAAAA`.
-- The completed pipeline/activity-balanced library uses the high-WT sequence.
+Mean cosine similarity between the additive (alpha) and pairwise (beta) weight matrices, at instance 0 / mut_rate 10% / lib_size 20000, computed from cached artifacts by `mRNA_RBP/scripts/maintenance/compute_coefficient_similarity.py` (see `coefficient_similarity.json`). Cosine similarity is scale-invariant but not sign-invariant, and MAVE-NN's GE nonlinearity has a real gauge freedom `(alpha, J, b) -> (-alpha, -J, -b)` that reproduces identical predictions -- the *sign-corrected* columns apply the single global sign (to both alpha and beta jointly) that maximizes agreement, so a surrogate that matched up to this legitimate flip isn't scored as if it learned the opposite direction.
 
-## Activity-Balanced Library
-
-The canonical evaluation library is `activity_balanced.npz`; this collection
-does not use or write `type2.npz`.
-
-Initialization recipe:
-
-- Sample exact-mutant candidate pools at 3, 5, 7, and 15 mutations from the
-  selected WT sequence.
-- Use 200,000 total candidates split evenly across those mutation counts.
-- Deduplicate candidates globally.
-- Score candidates with the ResidualBind VTS1 oracle score.
-- Histogram-uniformize in score space with 200 equal-width bins, percentile
-  clipping `[1, 99]`, seed `k*10000 + 600`, and target cap 20,000 sequences.
-- The final count can be below 20,000 if nonempty score bins are sparse.
+| condition | cos sim (additive) | cos sim (pairwise) | sign-corrected (additive) | sign-corrected (pairwise) | sign flipped? |
+|---|---|---|---|---|---|
+| `vts1_high` | 0.6378 | 0.3939 | 0.6378 | 0.3939 | — |
+| `vts1_low` | 0.9170 | 0.4102 | 0.9170 | 0.4102 | — |

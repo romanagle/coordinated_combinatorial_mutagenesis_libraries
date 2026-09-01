@@ -1,4 +1,4 @@
-from .gt_init import (
+from .src.gt_init import (
     init_mRNA_RBP_gt,
     init_gaussian_pairwise_sparse,
     init_wc_pairwise_sparse,

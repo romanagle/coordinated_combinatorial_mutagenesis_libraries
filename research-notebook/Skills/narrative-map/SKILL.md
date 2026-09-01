@@ -121,8 +121,9 @@ When the user stops narrative work:
 1. Report the exact Part and subpoint where work stopped.
 2. Reconcile `NARRATIVE.md` Holes with the canonical project task file without duplicating one category into the other.
 3. Use the research-update workflow when the user asks to log or preserve the session.
-4. Commit and push only when explicitly requested, staging only narrative, accepted prototypes, and notebook handoff files.
-5. Preserve unrelated working-tree changes.
+4. Before any Git operation, verify `git remote get-url origin` identifies `romanagle/research-notebook.git`; stop if it identifies a code repository.
+5. Commit and push only when explicitly requested, staging only narrative, accepted prototypes, and notebook handoff files in the standalone Research vault.
+6. Preserve unrelated working-tree changes.
 
 ## Report
 

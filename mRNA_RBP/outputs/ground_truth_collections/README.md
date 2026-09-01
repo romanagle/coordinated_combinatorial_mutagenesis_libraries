@@ -1,9 +1,11 @@
 # Ground Truth Collections
 
-Curated final figures, cached artifacts, and per-ground-truth pipeline workspaces. All non-synthetic output workspaces are contained inside their corresponding GT folder under `pipeline_workspace/`; no sibling `mRNA_RBP/outputs_*` directories are used.
+Curated final figures and cached artifacts for each ground truth. Every collection uses the same standardized layout: `figures/` for the curated plots and `libraries_used_for_figures/` for the libraries, coefficients, results JSON, and (where applicable) trained oracle/surrogate weights that produced them; no sibling `mRNA_RBP/outputs_*` directories are used.
 
 - `Synthetic GT`: 12 figures, 680 cached artifacts, 0 missing sources
-- `ResidualBind oracle VTS1`: 11 figures, 131 cached artifacts, 0 missing sources
-- `ResidualBind oracle MSI1`: 11 figures, 69 cached artifacts, 0 missing sources
-- `deepSQUID VTS1`: 5 figures, 5 cached artifacts, 0 missing sources
-- `deepSQUID MSI1`: 5 figures, 5 cached artifacts, 0 missing sources
+- `ResidualBind oracle VTS1`: 34 figures, 102 cached artifacts, 0 missing sources
+- `deepSQUID VTS1`: 33 figures, 100 cached artifacts, 0 missing sources
+- `ResidualBind oracle HuR`: 27 figures, 102 cached artifacts, 0 missing sources
+- `deepSQUID HuR`: 27 figures, 100 cached artifacts, 0 missing sources
+
+MSI1 and legacy VTS1 collections are excluded from the active project.

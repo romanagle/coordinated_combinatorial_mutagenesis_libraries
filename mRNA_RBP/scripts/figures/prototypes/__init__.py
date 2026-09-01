@@ -1,0 +1,1 @@
+"""Prototype-specific figure generators."""

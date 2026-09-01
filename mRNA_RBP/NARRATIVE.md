@@ -2,10 +2,13 @@
 
 ## Question
 
-- Random mutagenesis samples multi-position variants, while library size and mutation rate determine sequence-space coverage.
-- Brittle landscapes may enrich random libraries for nonfunctional variants and obscure the underlying sequence-function relationship.
-- Held-out accuracy may overstate recovery when training and test variants share the same biased distribution.
-- How do random-library size, mutation rate, and sequence-function landscape properties affect recovery of the underlying sequence-function relationship?
+- How do four factors (mutation scheme, library size, evaluation distribution, and surrogate-model form) shape when random-holdout evaluation overstates recovery of RNA sequence–function landscapes?
+
+- Part I: Random libraries sample skewed regions of RNA activity landscapes.
+- Part II: Synthetic GT establishes the evaluation bias under controlled conditions.
+- Part III: Biological RNA landscapes reproduce the evaluation bias.
+- Part III subpoint: The evaluation gap persists across tested training-library sizes.
+- Part IV: Random-holdout accuracy can conceal surrogate-model misspecification.
 
 ## Methods
 
@@ -18,7 +21,12 @@
 - The WT always scores 0, and all mutations score ≤ 0 by construction.
 - Five instances use different random weight draws, with different α magnitudes but the same structure.
 
-![Synthetic ground-truth additive weights and stem-pair couplings](<prototypes/synthetic_gt_methods_figure/outputs/synthetic_gt_coefficients_only.png>)
+![Synthetic ground-truth additive weights and stem-pair couplings](<figures/synthetic_gt_coefficients_only.png>)
+
+- A motif-only negative control shares the same sequence and motif position as the structured GT, but has only the additive motif effect — no other privileged additive regions and no pairwise coupling — so it serves as a sequence-only sequence-to-function relationship.
+- This is not fully biologically realistic; whether to revisit the negative-control setup is still open.
+
+![Structured positive control versus motif-only negative control: exact additive and pairwise coefficient matrices](<figures/both_synthetic_gt_additive_pairwise_matrices.png>)
 
 ### Experimental design
 
@@ -30,15 +38,13 @@
 - deepSQUID VTS1 provides a biological structure-dependent landscape with a high-activity wild type and recognizes a GCUGG motif.
 - deepSQUID HuR provides a sequence-motif negative control with a high-activity wild type and recognizes an AUUUA motif.
 
-![Placeholder for VTS1 and HuR high-activity-sequence secondary structures](<prototypes/secondary_structure_methods_figure/outputs/vts1_hur_secondary_structure_placeholder.png>)
+![Placeholder for VTS1 and HuR high-activity-sequence secondary structures](<figures/vts1_hur_secondary_structure_placeholder.png>)
 
 - Random libraries vary size and mutation rate and train nonlinear additive-plus-pairwise surrogates.
 - Activity-balanced evaluation measures recovery outside the random library's skewed activity distribution.
 - Targeted-pairwise evaluation currently contains double mutants restricted to annotated base-pairing regions.
 - SSM supplies an additive-only baseline for learning higher-order sequence-function relationships.
-- Oracle validation: held-out agreement between deepSQUID and ResidualBind supports using deepSQUID as the primary oracle in subsequent experiments.
-
-![deepSQUID versus ResidualBind held-out agreement](<outputs/ground_truth_collections/deepsquid_vs_real_oracle_heldout_test_bar.png>)
+- Oracle validation: held-out Spearman ρ between deepSQUID and ResidualBind is 0.966 (VTS1, n=39,991) and 0.973 (HuR, n=40,358), supporting deepSQUID as the primary oracle in subsequent experiments.
 
 ## Results
 
@@ -50,16 +56,16 @@
 - The matched skew of the random training and test libraries is expected to produce high random-holdout accuracy without probing the entire sequence–function landscape.
 - Uniform evaluation should therefore assess recovery of the underlying sequence–function relationship more accurately than a random holdout drawn from the training distribution.
 
-![Positive- and negative-control Synthetic GT additive and pairwise coefficients alongside activity distributions for model-development, held-out random-test, and activity-balanced evaluation libraries](<prototypes/synthetic_gt_distribution_figure/outputs/synthetic_gt_activity_distributions.png>)
+![Positive- and negative-control Synthetic GT additive and pairwise coefficients alongside activity distributions for model-development, held-out random-test, and activity-balanced evaluation libraries](<figures/synthetic_gt_activity_distributions.png>)
 
 #### 2. Random-holdout accuracy can conceal poor landscape-wide recovery
 
-- Both Synthetic GTs produce nearly perfect random-library holdout correlations for the 10% mutation, 20K training condition (structured positive control: Spearman ρ = 0.989; unstructured negative control: ρ = 1.000).
-- Activity-balanced evaluation sharply reduces recovery in both landscapes (structured positive control: ρ = 0.315; unstructured negative control: ρ = 0.379).
-- The structured Synthetic GT predictions compress over the broader activity-balanced range, whereas the unstructured control shows mutation-count-stratified departures from the diagonal.
-- Contrary to the expected result, removing privileged motif/stem structure does not produce high activity-balanced recovery; the current unstructured Synthetic GT therefore does not validate the intended negative-control contrast and requires redesign or reinterpretation.
+- Both Synthetic GTs use fixed-10% (four-mutation), 20K training libraries and produce nearly perfect random-library holdout correlations (structured positive control: Spearman ρ = 0.990; motif-only negative control: ρ = 1.000).
+- Both use the standard activity-balanced construction: 200K candidate sequences split across 3, 5, 7, and 15 mutations, followed by histogram uniformization to 20K sequences under each control's own ground-truth activity.
+- With the smallest tested near-neutral background that supports a complete evaluation library (effect scale 0.10 versus 3.0 at motif positions), the motif-dominated negative control reaches random-holdout ρ = 1.000 and activity-balanced ρ = 0.527, still below HuR (ρ = 0.941).
+- This small nonzero background avoids the score-bin sparsity of exactly neutral and 0.05-scale backgrounds, allowing the standard histogram-uniformization procedure to retain the full 20K activity-balanced target.
 
-![Actual positive- and negative-control Synthetic GT predictions on matched random-library holdout and activity-balanced evaluation sets](<prototypes/synthetic_gt_scatter_expectation/outputs/synthetic_gt_scatter_actual.png>)
+![Actual positive- and negative-control Synthetic GT predictions on matched random-library holdout and activity-balanced evaluation sets](<figures/synthetic_gt_scatter_actual.png>)
 
 #### 3. Random-holdout accuracy can mask model misspecification
 
@@ -74,10 +80,10 @@
 
 - The biological random-library activity distributions show the same type of skew posited in the Synthetic GT proof of concept.
 - Increasing mutation count produces progressively skewed random-library activity distributions.
-- The current VTS1 example confounds motif disruption with stem disruption because its motif lies inside the stem.
-- A new landscape with non-overlapping motif and stem regions is required before assigning the mechanism.
+- The VTS1 high-WT sequence was replaced with a natural RNCMPT00111 probe whose GCUGG motif is fully unpaired in its own RNAfold MFE structure (zero overlap with its 3-pair stem), resolving the earlier motif/stem confound; raw ResidualBind WT activity also increased from 4.55 to 8.83.
+- Libraries, the deepSQUID VTS1 surrogate (held-out test ρ = 0.960), and this distribution figure were regenerated under the new sequence; other downstream VTS1 figures remain to be regenerated (see Holes).
 
-![Paired biological activity-distribution ridgelines](<prototypes/distribution_pair_figure/variant_a_paired_ridgelines.png>)
+![VTS1 and HuR region-conditioned activity distributions at 10% mutation rate](<figures/simplified_a_10pct_focus.png>)
 
 #### 2. Biological landscapes recreate accuracy inflation across library sizes
 
@@ -89,9 +95,9 @@
 - The contrast suggests that held-out accuracy is reliable for HuR but inflated for VTS1.
 - The summary table will test whether predictive-accuracy inflation is accompanied by disagreement between the learned and ground-truth additive and pairwise coefficients.
 
-![Biological library-size comparison](<prototypes/library_size_figure/outputs/variant_f_biological_pair.png>)
+![Biological library-size comparison](<figures/variant_f_biological_pair.png>)
 
-![Placeholder for biological recovery and coefficient-agreement summary](<prototypes/biological_summary_table/outputs/hur_vts1_summary_table_placeholder.png>)
+![Placeholder for biological recovery and coefficient-agreement summary](<figures/hur_vts1_summary_table_placeholder.png>)
 
 ### Part III. Failure modes underlying the recovery gap
 
@@ -103,7 +109,7 @@
 - Current targeted-pairwise VTS1 recovery is unexpectedly high and is not yet trusted.
 - Saturated additive-plus-pairwise evaluation is omitted until its unique purpose is clarified.
 
-![Preferred evaluation-library comparison prototype](<prototypes/library_roles_figure/variant_b_mutation_order.png>)
+![Preferred evaluation-library comparison prototype](<figures/variant_b_mutation_order.png>)
 
 #### 2. Mutation count and mutation rate locate overprediction and underprediction
 
@@ -116,7 +122,7 @@
 - Mutation-count striations are reproducible visual structure but do not yet have a mechanistic interpretation.
 - Standardized activity-score residual distributions replace the paired scatterplots as the mutation-count-resolved view of overprediction and underprediction.
 
-![HuR and VTS1 standardized activity-score residual distributions by mutation count](<prototypes/activity_balanced_failure_bars/outputs/variant_o_standardized_residual_violins.png>)
+![HuR and VTS1 standardized activity-score residual distributions by mutation count](<figures/variant_o_standardized_residual_violins.png>)
 
 ![Synthetic GT mutation-rate transfer](<outputs/ground_truth_collections/Synthetic GT/figures/mutation_rate_sweep/synthetic_gt_cross_mutrate_heatmap.png>)
 
@@ -130,11 +136,12 @@
 
 ## Holes
 
+- Biological generalization: determine whether and where SMN1 or the GFP ortholog landscapes supply supporting evidence without replacing Synthetic GT, HuR, or VTS1 as the main examples, then repeat the core library-size, mutation-rate, and evaluation-library comparisons on any dataset selected.
 - Part I, Section 1: generate the synthetic ground-truth negative control and test whether, provisionally at 10% mutation rate, its random training and test activity distributions share the expected skew relative to uniform evaluation.
 - Part I, Section 2: replace the simulated expectation with the matched negative-control and existing Synthetic GT scatterplots and observed Spearman correlation coefficients.
 - Part I, Section 3: determine which model-form and evaluation-library comparisons are necessary to demonstrate hidden misspecification without overloading the figure.
-- Part II, Section 1: select and run a landscape with separable motif and stem regions.
 - Part II, Section 1: define what score loss constitutes a nonfunctional VTS1 variant.
+- VTS1 sequence swap: every VTS1-dependent figure downstream of the deepSQUID surrogate (Part II, Section 2 library-size comparison; Part III, Section 1 targeted-pairwise/library-roles; Part III, Section 2 residual violins and mutation-rate transfer heatmap) was generated under the old, motif-overlapping WT and needs regeneration under the new sequence.
 - Part II, Section 2: rerun all library-size comparisons across 10 initializations and regenerate the selected triptych.
 - Part II, Section 2: populate the HuR/VTS1 summary table with mean Spearman ρ ± SD and additive- and pairwise-coefficient cosine similarities across initializations.
 - Part III, Section 1: redesign targeted pairwise to test mutation orders n = 2, 3, 4, and onward through mutation of the complete stem.
@@ -149,9 +156,15 @@
 
 ## Supplement
 
+### VTS1 activity and motif coverage
+
+- Broad activity coverage can coexist with motif preservation and sparse alternative mechanisms in VTS1.
+
+![VTS1 activity mutation map](<figures/vts1_activity_mutation_map.png>)
+
 ### Raw Spearman correlation coefficients
 
-- Report the raw Spearman correlation coefficients for every library size, mutation rate, and initialization.
+- Report the raw Spearman correlation coefficients for every library size, mutation rate, surrogate form, and initialization.
 
 ### Low-wild-type activity distributions
 
@@ -163,3 +176,4 @@
 - Repeated scatterplots across every mutation rate are cut; one matched HuR/VTS1 pair is sufficient.
 - ResidualBind-oracle pipeline results are cut except for validating deepSQUID as a replacement oracle.
 - Twister and MSI1 are archived and excluded from the active example set.
+- [deepSQUID versus ResidualBind held-out agreement](<outputs/ground_truth_collections/deepsquid_vs_real_oracle_heldout_test_bar.png>) is cut; two values don't warrant a bar chart, so the oracle-validation claim is now stated directly in Methods.

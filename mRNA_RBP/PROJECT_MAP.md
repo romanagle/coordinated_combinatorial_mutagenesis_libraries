@@ -3,8 +3,7 @@
 ## Start here
 
 - Manuscript prose is managed externally in Google Docs and is not available in this repository.
-- Repository-current narrative: [`NARRATIVE.md`](NARRATIVE.md).
-- Figure inventory: [`narrative_variants/evaluation_bias_figure_inventory.md`](narrative_variants/evaluation_bias_figure_inventory.md).
+- Repository-current narrative: [`NARRATIVE.md`](NARRATIVE.md) — the single source of truth for manuscript content; there is no separate figure inventory.
 - Cleanup classification: [`CLEANUP_MANIFEST.md`](CLEANUP_MANIFEST.md).
 - Output-directory guide: [`docs/OUTPUT_DIRECTORIES.md`](docs/OUTPUT_DIRECTORIES.md).
 - Research status and decisions: [`../research-notebook/Projects/random_lib_mutagenesis.md`](../research-notebook/Projects/random_lib_mutagenesis.md).
@@ -14,14 +13,9 @@
 
 1. Google Doc — manuscript-current wording and ordering; external and not verified here.
 2. `NARRATIVE.md` — repository-current claims, figure selections, holes, and exclusions.
-3. `evaluation_bias_figure_inventory.md` — broadest figure index, but scientifically stale in places.
 
 ## Known synchronization gaps
 
-- The figure inventory still describes the discarded unstructured negative control with activity-balanced `ρ = 0.379`.
-- `NARRATIVE.md` uses the motif-only negative control with activity-balanced `ρ = 0.527`.
-- The inventory selects `distribution_pair_figure/variant_a_paired_ridgelines.png`.
-- `NARRATIVE.md` selects `distribution_pair_figure/simplified_a_10pct_focus.png`.
 - Google Doc agreement cannot be assessed until it is exported or pasted into the workspace.
 
 ## Repository-current manuscript shape
@@ -84,8 +78,9 @@
 - Maintenance commands: `scripts/maintenance/`.
 - Core and prototype figure generators: `scripts/figures/`.
 - Exploratory commands: `scripts/experiments/`.
-- Prototype figures and supporting assets: `prototypes/` (no executable code).
-- Curated active figures and supporting artifacts: `outputs/ground_truth_collections/`.
+- Transient figure-making workspace: `prototypes/` (no executable code) — sparse by design; once a variant is selected into `NARRATIVE.md` its image moves to `figures/` and the rest of its prototype directory is archived.
+- Selected narrative-active figures produced by prototype scripts: `figures/` — flat, image files only, one per `NARRATIVE.md` embed.
+- Curated active figures and supporting artifacts from the ground-truth-collection pipeline: `outputs/ground_truth_collections/`.
 - Generated run directories and their status: `docs/OUTPUT_DIRECTORIES.md`; do not browse `outputs_*` for final figures.
 - External reference repositories: `../external/`; project-owned oracle training remains in `../rbp/`.
 

@@ -22,11 +22,12 @@
 | --- | --- | --- | --- |
 | `NARRATIVE.md` | ACTIVE | Repository-current narrative map | Keep at project root. |
 | `PROJECT_MAP.md` | ACTIVE | Navigation and authority map | Keep at project root. |
-| `narrative_variants/evaluation_bias_figure_inventory.md` | ACTIVE | Broad figure index | Synchronize with `NARRATIVE.md` and Google Doc. |
 | `src/` | SOURCE | Reusable ground truths, oracle routing, evaluation, sequence, and visualization modules | Keep importable scientific code here. |
 | `scripts/` | SOURCE + CANDIDATE | All executable pipeline, figure, maintenance, and exploratory commands | Navigate by the categorized subdirectories. |
 | `experiments/` | CANDIDATE evidence | Result notes only; executable experiment code moved to `scripts/experiments/` | Review notes against active or revisit sections. |
-| `prototypes/` | ACTIVE + CANDIDATE assets | Accepted figures, supporting data, and unselected figure assets; executable code moved to `scripts/figures/prototypes/` | Retain selected outputs; archive rejected assets after review. |
+| `prototypes/` | GENERATED (transient) | Sparse, transient figure-making workspace only; executable code lives in `scripts/figures/prototypes/` | Keep empty except for figures currently under active iteration; promote or archive on selection. |
+| `figures/` | ACTIVE | Flat store of narrative-selected images produced by prototype scripts, one per `NARRATIVE.md` embed | Keep in sync with `NARRATIVE.md`; remove a file only when its embed is cut. |
+| `archive/prototypes/` | ARCHIVED | Former `prototypes/<name>/` directories, in full, after their selected figure (if any) was promoted to `figures/` | Review by dated batch; do not use as evidence. |
 | `outputs/` | ACTIVE + GENERATED | Canonical collections plus legacy synthetic working files | Navigate through `ground_truth_collections/`; migrate remaining legacy run files separately. |
 | `runs/` | GENERATED | Canonical location for active working runs | Keep out of manuscript navigation. |
 | `models/` | SOURCE | Canonical fitted models loaded by oracle code | Retain and document promotion after retraining. |
@@ -44,40 +45,27 @@ is the curated evidence store; generated working state now lives under `runs/`.
 
 | Manuscript role | Selected path | Class |
 | --- | --- | --- |
-| Synthetic GT definition | `prototypes/synthetic_gt_methods_figure/outputs/synthetic_gt_coefficients_only.png` | ACTIVE |
-| Biological structures | `prototypes/secondary_structure_methods_figure/outputs/vts1_hur_secondary_structure_placeholder.png` | ACTIVE placeholder |
-| Oracle validation | `outputs/ground_truth_collections/deepsquid_vs_real_oracle_heldout_test_bar.png` | ACTIVE |
-| Synthetic distributions | `prototypes/synthetic_gt_distribution_figure/outputs/synthetic_gt_activity_distributions.png` | ACTIVE |
-| Synthetic recovery | `prototypes/synthetic_gt_scatter_expectation/outputs/synthetic_gt_scatter_actual.png` | ACTIVE |
+| Synthetic GT definition | `figures/synthetic_gt_coefficients_only.png` | ACTIVE |
+| Synthetic GT vs. negative control comparison | `figures/both_synthetic_gt_additive_pairwise_matrices.png` | ACTIVE |
+| Biological structures | `figures/vts1_hur_secondary_structure_placeholder.png` | ACTIVE placeholder |
+| Oracle validation | *(cut; stated as text in Methods — see Revisit in `NARRATIVE.md`)* | — |
+| Synthetic distributions | `figures/synthetic_gt_activity_distributions.png` | ACTIVE |
+| Synthetic recovery | `figures/synthetic_gt_scatter_actual.png` | ACTIVE |
 | Model misspecification | `outputs/ground_truth_collections/Synthetic GT/figures/model_comparison/model_comparison_bar_type3.png` | ACTIVE provisional |
-| Biological distributions | `prototypes/distribution_pair_figure/simplified_a_10pct_focus.png` | ACTIVE |
-| Library-size recovery | `prototypes/library_size_figure/outputs/variant_f_biological_pair.png` | ACTIVE provisional |
-| Biological scatterplots | `prototypes/scatter_pair_figure/variant_a_clean_pair.png` | ACTIVE |
-| Mutation-resolved errors | `prototypes/activity_balanced_failure_bars/outputs/variant_o_standardized_residual_violins.png` | ACTIVE |
+| Biological distributions | `figures/simplified_a_10pct_focus.png` | ACTIVE |
+| Library-size recovery | `figures/variant_f_biological_pair.png` | ACTIVE provisional |
+| Biological recovery/coefficient summary | `figures/hur_vts1_summary_table_placeholder.png` | ACTIVE placeholder |
+| Evaluation-library comparison | `figures/variant_b_mutation_order.png` | ACTIVE |
+| Mutation-resolved errors | `figures/variant_o_standardized_residual_violins.png` | ACTIVE |
+| VTS1 activity/motif coverage (supplement) | `figures/vts1_activity_mutation_map.png` | ACTIVE |
 
 ## Prototype directory triage
 
-| Directory | Class | Reason |
-| --- | --- | --- |
-| `synthetic_gt_methods_figure/` | ACTIVE | Contains selected Methods figure. |
-| `secondary_structure_methods_figure/` | ACTIVE placeholder | Selected but not final evidence. |
-| `synthetic_gt_distribution_figure/` | ACTIVE | Contains selected distribution figure. |
-| `synthetic_gt_scatter_expectation/` | ACTIVE | Contains selected recovery figure. |
-| `distribution_pair_figure/` | ACTIVE + SUPERSEDED | Selected simplified panel mixed with rejected variants. |
-| `library_size_figure/` | ACTIVE + SUPERSEDED | Selected variant F mixed with alternatives. |
-| `scatter_pair_figure/` | ACTIVE + SUPERSEDED | Selected clean pair mixed with alternatives. |
-| `activity_balanced_failure_bars/` | ACTIVE + SUPERSEDED | Variant O selected; variants A–N rejected or superseded. |
-| `vts1_activity_mutation_map/` | CANDIDATE | Supported supplement candidate. |
-| `residual_sequence_umap/` | CANDIDATE | Exploratory supplement candidate. |
-| `library_roles_figure/` | CANDIDATE | Parked pending evaluation-library redesign. |
-| `synthetic_gt_coefficient_maps/` | CANDIDATE | No settled Results role. |
-| `vts1_three_coefficient_maps/` | CANDIDATE | No settled Results role. |
-| `hur_three_coefficient_maps/` | CANDIDATE | No settled Results role. |
-| `biological_summary_table/` | CANDIDATE placeholder | Awaiting replicated metrics. |
-| `saturated_nonlinearity_library/` | CANDIDATE | No settled manuscript role. |
-| `pairwise_saturation_landscape/` | CANDIDATE | Three alternative layouts without a settled claim. |
-| `vts1_prediction_entropy/` | CANDIDATE | Lacks manuscript interpretation. |
-| `vts1_activity_motif_histogram/` | CANDIDATE | Lacks settled narrative role. |
+`prototypes/` was reorganized into a sparse, transient-only workspace (2026-08-31, Batch 13 below):
+every directory's selected figure (if it had one) was promoted to `figures/`, and the entire former
+directory — selected-figure-bearing or CANDIDATE — was moved intact to `archive/prototypes/<name>/`.
+`prototypes/` is currently empty; new work should only ever pass through it on its way to `figures/`
+or `archive/prototypes/`, never accumulate there.
 
 ## Output directory triage
 
@@ -204,20 +192,41 @@ is the curated evidence store; generated working state now lives under `runs/`.
 - Updated: package imports, subprocess commands, shell commands, project-root calculations, prototype output roots, narrative documentation, and workspace maps.
 - Result: no Python scripts remain scattered across `prototypes/`, `plots/`, or `experiments/`; the former `plots/` directory was removed.
 
+### Batch 12 — Figure inventory retired into `NARRATIVE.md`
+
+- Completed: 2026-08-31.
+- Removed: `narrative_variants/evaluation_bias_figure_inventory.md` (and the now-empty `narrative_variants/` directory), which had drifted stale — it still described the discarded "unstructured negative control" (activity-balanced ρ = 0.379) while `NARRATIVE.md` already carried the motif-only redesign (ρ = 0.527).
+- Folded into `NARRATIVE.md`: a new Supplement subsection for the VTS1 activity/motif-coverage figure (previously only listed as "supported" in the inventory, not yet in `NARRATIVE.md`); named SMN1/GFP explicitly in the existing biological-generalization Hole; added "surrogate form" to the raw-Spearman Supplement bullet's axis list.
+- Dropped as stale or already covered: the inventory's stale negative-control numbers, its unselected figure choices (already superseded by `NARRATIVE.md`'s own selections), and every "Explicit holes" entry that duplicated an existing `NARRATIVE.md` Hole or belonged in the project task file instead.
+- Left out pending user review: the VTS1 residual-sequence-UMAP and prediction-bin-entropy/motif-histogram explorations — the inventory listed these as still-open, but the research notebook already files the UMAP under "archived exploratory outputs," so promoting any of them into `NARRATIVE.md` was left to the user rather than assumed.
+- Updated: `PROJECT_MAP.md` (removed the figure-inventory pointer, authority-order entry, and the now-resolved synchronization-gap notes).
+- Result: `NARRATIVE.md` is the single manuscript-content document; no more parallel figure inventory to keep in sync.
+
+### Batch 13 — `prototypes/` emptied into `figures/` and `archive/prototypes/`
+
+- Completed: 2026-08-31.
+- Created: `figures/` (flat, images only) and `archive/prototypes/`.
+- Promoted: the 10 images `NARRATIVE.md` currently embeds from `prototypes/<name>/` moved to `figures/<file>.png`; `NARRATIVE.md`'s 10 corresponding links updated in place. (The former "Oracle validation" figure was cut from `NARRATIVE.md` separately, earlier the same day — its claim is now stated as text in Methods, so it was never part of this batch's promotion set.)
+- Archived whole, unmodified: the remaining contents of those same 10 directories (rejected sibling variants, READMEs, npz/csv caches) plus all 10 directories that had no `NARRATIVE.md` reference at all (`hur_three_coefficient_maps/`, `oracle_validation_scorecard/`, `pairwise_saturation_landscape/`, `residual_sequence_umap/`, `saturated_nonlinearity_library/`, `scatter_pair_figure/`, `synthetic_gt_coefficient_maps/`, `vts1_activity_motif_histogram/`, `vts1_prediction_entropy/`, `vts1_three_coefficient_maps/`) — each moved intact to `archive/prototypes/<name>/`, at the user's explicit direction to archive every currently-unreferenced prototype directory, settled-candidate or not.
+- Retained: generating code, already living separately at `scripts/figures/prototypes/<name>/` per Batch 11 — untouched, so every archived figure remains regenerable by rerunning its script.
+- Result: `prototypes/` is empty. Going forward it exists only for work actively being iterated on; a directory leaves it either by promoting its selected image to `figures/` (rest of directory to `archive/prototypes/`) or, if fully rejected, by moving wholesale to `archive/prototypes/`.
+- Recovery: every moved file is untracked or plain-modified in Git (no commits made); `git status`/`git diff` against the pre-batch worktree recovers exact former paths, and each archived directory keeps its generating script runnable in `scripts/figures/prototypes/<name>/` for full regeneration.
+- Verification: all 10 `figures/` paths embedded in `NARRATIVE.md` resolve on disk; no `prototypes/` path remains referenced anywhere in `NARRATIVE.md`.
+
 ## Blockers before moving or deleting
 
 - The Google Doc has not been compared with repository narratives.
 - The worktree already contains extensive modifications and deletions.
 - Several generated collections are being reorganized in the uncommitted worktree.
 - The redesigned negative control and VTS1 sequence changes are not yet committed in the code repository.
-- Active figure provenance is distributed across prototypes, curated collections, and raw output directories.
+- Active figure provenance is still split between `figures/` (prototype-script output) and `outputs/ground_truth_collections/` (pipeline output); no single evidence store yet covers both.
 - `ResidualBind oracle VTS1/manifest.json` contains 116 pre-existing source references to raw/staging artifacts that are no longer present; its curated destination files need a separate provenance reconciliation.
 
 ## Proposed cleanup sequence
 
 1. Export the Google Doc to Markdown or place a copy in the workspace.
-2. Reconcile it with `NARRATIVE.md` and the figure inventory.
-3. Select one canonical file for narrative state and one for figure inventory.
+2. Reconcile it with `NARRATIVE.md`.
+3. ~~Select one canonical file for narrative state and one for figure inventory.~~ Done in Batch 12: `NARRATIVE.md` is the single canonical file; the separate figure inventory was retired.
 4. Trace every selected figure to its generating script and required input files.
 5. Move rejected variants into one clearly named dated archive directory.
 6. Consolidate active generated evidence into a small curated-results tree.

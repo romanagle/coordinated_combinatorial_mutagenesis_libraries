@@ -44,34 +44,14 @@ COLLECTION_PRESETS = {
 }
 
 VTS1_ARTIFACT_COMMANDS = [
-    [sys.executable, "mRNA_RBP/generate_residualbind_vts1_scatter_predictions.py", "--force"],
+    [sys.executable, "mRNA_RBP/scripts/pipeline/generate_residualbind_vts1_scatter_predictions.py", "--force"],
 ]
 
 VTS1_PLOT_COMMANDS = [
-    [sys.executable, "mRNA_RBP/plots/plot_residualbind_vts1_collection_figures.py"],
-    [sys.executable, "mRNA_RBP/plots/plot_residualbind_vts1_result_figures.py"],
-    [sys.executable, "mRNA_RBP/plots/plot_residualbind_vts1_rand_region_distributions.py"],
-    [sys.executable, "mRNA_RBP/plots/plot_residualbind_vts1_scatter_by_mutcount.py"],
-    [
-        sys.executable,
-        "mRNA_RBP/plots/plot_cross_mutrate.py",
-        "--results_json",
-        "mRNA_RBP/outputs/ground_truth_collections/ResidualBind oracle VTS1/libraries_used_for_figures/cross_mutrate_results.json",
-        "--gt_key",
-        "vts1_residualbind",
-        "--out_prefix",
-        "vts1_",
-        "--out_base",
-        "mRNA_RBP/outputs/ground_truth_collections/ResidualBind oracle VTS1/cached outputs/fresh_pipeline_workspace_20260704",
-    ],
-]
-
-VTS1_CROSS_MUTRATE_PLOTS = [
-    "vts1_cross_mutrate_heatmap.png",
-    "vts1_cross_mutrate_libsize_additive.png",
-    "vts1_cross_mutrate_libsize_additive_p_pairwise.png",
-    "vts1_cross_mutrate_libsize_nonlinear_additive.png",
-    "vts1_cross_mutrate_libsize_nonlinear_additive_p_pairwise.png",
+    [sys.executable, "mRNA_RBP/scripts/figures/core/plot_residualbind_vts1_collection_figures.py"],
+    [sys.executable, "mRNA_RBP/scripts/figures/core/plot_residualbind_vts1_result_figures.py"],
+    [sys.executable, "mRNA_RBP/scripts/figures/core/plot_residualbind_vts1_rand_region_distributions.py"],
+    [sys.executable, "mRNA_RBP/scripts/figures/core/plot_residualbind_vts1_scatter_by_mutcount.py"],
 ]
 
 DEFAULT_FIGURES = {
@@ -87,33 +67,51 @@ DEFAULT_FIGURES = {
     "cross_mutrate_heatmap": DEFAULT_MRNA_PLOT_DIR / "synthetic_gt_cross_mutrate_heatmap.png",
 }
 
+# Subdirectory each DEFAULT_FIGURES key is staged under, mirroring the
+# library_distributions/mutation_rate_sweep/library_size_sweep/coefficients/
+# model_comparison layout used by named collections (see stage_collection_figures).
+FIGURE_CATEGORIES = {
+    "coefficient_analysis": "coefficients",
+    "evaluation_library_distributions": "library_distributions",
+    "scatter_by_mutcount": "mutation_rate_sweep",
+    "rho_vs_libsize_type3": "library_size_sweep",
+    "model_comparison_type3": "model_comparison",
+    "cross_mutrate_heatmap": "mutation_rate_sweep",
+}
+
 DEFAULT_RANDOM_LIBRARY_FIGURES = {
     "residualbind": [
         DEFAULT_COLLECTION_DIR
         / "ResidualBind oracle MSI1"
         / "figures"
+        / "library_distributions"
         / "rand_lib_dist_msi1_oracle_region_classes.png",
         DEFAULT_COLLECTION_DIR
         / "ResidualBind oracle MSI1"
         / "figures"
+        / "library_distributions"
         / "rand_lib_dist_msi1_oracle_region_classes_low_wt.png",
         DEFAULT_COLLECTION_DIR
         / "ResidualBind oracle VTS1"
         / "figures"
+        / "library_distributions"
         / "rand_lib_dist_vts1_oracle_region_classes.png",
         DEFAULT_COLLECTION_DIR
         / "ResidualBind oracle VTS1"
         / "figures"
+        / "library_distributions"
         / "rand_lib_dist_vts1_oracle_region_classes_low_wt.png",
     ],
     "deepsquid": [
         DEFAULT_COLLECTION_DIR
         / "deepSQUID MSI1"
         / "figures"
+        / "library_distributions"
         / "rand_lib_dist_msi1_deepsquid.png",
         DEFAULT_COLLECTION_DIR
         / "deepSQUID VTS1"
         / "figures"
+        / "library_distributions"
         / "rand_lib_dist_vts1_deepsquid.png",
     ],
 }
@@ -121,7 +119,7 @@ DEFAULT_RANDOM_LIBRARY_FIGURES = {
 SUPPORTED_REGEN_COMMANDS = [
     [
         sys.executable,
-        "mRNA_RBP/lib_size_spearman.py",
+        "mRNA_RBP/scripts/pipeline/lib_size_spearman.py",
         "--out_json",
         "mRNA_RBP/outputs/lib_size_spearman_results_type3.json",
         "--recompute_saturated",
@@ -132,14 +130,14 @@ SUPPORTED_REGEN_COMMANDS = [
         "nonlin_additive",
         "nonlin_additive_pairwise",
     ],
-    [sys.executable, "mRNA_RBP/plots/plot_library_distributions.py"],
-    [sys.executable, "mRNA_RBP/plots/plot_synthetic_rand_region_distributions.py"],
-    [sys.executable, "mRNA_RBP/plots/plot_scatter_by_mutcount.py"],
-    [sys.executable, "mRNA_RBP/plots/plot_rho_vs_libsize_type3.py"],
-    [sys.executable, "mRNA_RBP/plots/bar_surrogate_models_type3.py"],
+    [sys.executable, "mRNA_RBP/scripts/figures/core/plot_library_distributions.py"],
+    [sys.executable, "mRNA_RBP/scripts/figures/core/plot_synthetic_rand_region_distributions.py"],
+    [sys.executable, "mRNA_RBP/scripts/figures/core/plot_scatter_by_mutcount.py"],
+    [sys.executable, "mRNA_RBP/scripts/figures/core/plot_rho_vs_libsize_type3.py"],
+    [sys.executable, "mRNA_RBP/scripts/figures/core/bar_surrogate_models_type3.py"],
     [
         sys.executable,
-        "mRNA_RBP/plots/plot_cross_mutrate.py",
+        "mRNA_RBP/scripts/figures/core/plot_cross_mutrate.py",
         "--out_prefix",
         "synthetic_gt_",
         "--out_base",
@@ -234,19 +232,6 @@ def run_commands(commands: List[List[str]], env: Dict[str, str]) -> List[dict]:
     return results
 
 
-def copy_vts1_cross_mutrate_outputs() -> List[dict]:
-    copied = []
-    src_dir = REPO / "mRNA_RBP" / "outputs" / "notebook_plots"
-    dst_dir = (
-        DEFAULT_COLLECTION_DIR
-        / "ResidualBind oracle VTS1"
-        / "figures"
-    )
-    for name in VTS1_CROSS_MUTRATE_PLOTS:
-        copied.append(copy_file(src_dir / name, dst_dir / name, required=True))
-    return copied
-
-
 def build_subprocess_env() -> Dict[str, str]:
     env = os.environ.copy()
     env.setdefault("PYTHONPATH", str(REPO))
@@ -280,7 +265,8 @@ def stage_outputs(args, out_dir: Path) -> list[dict]:
                 figure_paths[key] = mrna_dir / src.relative_to(DEFAULT_MRNA_PLOT_DIR)
 
     for key, src in figure_paths.items():
-        staged.append(copy_file(Path(src), out_dir / f"{key}.png", required=args.require_all))
+        category = FIGURE_CATEGORIES[key]
+        staged.append(copy_file(Path(src), out_dir / category / f"{key}.png", required=args.require_all))
 
     if args.ground_truth == "synthetic":
         random_sources = [
@@ -295,21 +281,26 @@ def stage_outputs(args, out_dir: Path) -> list[dict]:
             random_sources = DEFAULT_RANDOM_LIBRARY_FIGURES[args.ground_truth]
     if args.require_all and not random_sources:
         raise FileNotFoundError("No random-library figures found")
-    random_out = out_dir / "random_library"
+    random_out = out_dir / "library_distributions" / "random_library"
     for src in random_sources:
         staged.append(copy_file(src, random_out / src.name, required=args.require_all))
     return staged
 
 
 def stage_collection_figures(collection_dir: Path, out_dir: Path, require_all: bool) -> list[dict]:
+    """Copy a collection's figures/ tree into out_dir/figures/, preserving any
+    subdirectory layout (e.g. library_distributions/, mutation_rate_sweep/,
+    library_size_sweep/, coefficients/, model_comparison/) so staged output
+    mirrors how the source figures are organized."""
     figures_dir = collection_dir / "figures"
     if not figures_dir.exists():
         if require_all:
             raise FileNotFoundError(figures_dir)
         return []
     staged = []
-    for src in sorted(figures_dir.glob("*.png")):
-        staged.append(copy_file(src, out_dir / "figures" / src.name, required=require_all))
+    for src in sorted(figures_dir.rglob("*.png")):
+        rel = src.relative_to(figures_dir)
+        staged.append(copy_file(src, out_dir / "figures" / rel, required=require_all))
     return staged
 
 
@@ -444,7 +435,6 @@ def main() -> int:
             raise ValueError("--regenerate-plots is currently implemented for --collection residualbind_vts1")
         commands = [[args.python] + cmd[1:] for cmd in VTS1_PLOT_COMMANDS]
         run_results.extend(run_commands(commands, build_subprocess_env()))
-        copy_results.extend(copy_vts1_cross_mutrate_outputs())
 
     if args.regenerate:
         if args.ground_truth != "synthetic":
@@ -477,8 +467,15 @@ def main() -> int:
         "post_plot_copies": copy_results,
         "staged_outputs": staged,
         "notes": [
-            "Random-library plots are staged under random_library/ because each GT can have multiple WT/oracle variants.",
-            "Named collections stage active figures from their ground_truth_collections/<collection>/figures directory.",
+            "Staged figures are organized into subdirectories by figure kind: "
+            "library_distributions/ (random, activity-balanced, type3, targeted-pairwise "
+            "score distributions, incl. random_library/ for GT/oracle variants), "
+            "mutation_rate_sweep/ (cross-mutation-rate heatmaps + libsize lines, "
+            "scatter-by-mutcount), library_size_sweep/ (rho vs training library size), "
+            "coefficients/ (coefficient maps, pairwise heatmaps), and model_comparison/ "
+            "(Spearman/RMSE model misspecification bars).",
+            "Named collections stage active figures from their ground_truth_collections/<collection>/figures "
+            "directory, mirroring whatever subdirectory layout already exists there.",
             "Artifact-generation steps run before plotting steps; plotting scripts should consume frozen libraries/results/prediction artifacts.",
         ],
     }
