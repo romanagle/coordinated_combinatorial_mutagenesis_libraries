@@ -51,6 +51,8 @@ SEED     = 0        # matches the "instance 00" convention used elsewhere in the
 MUT_PCT  = 10
 LIB_SIZE = 20_000
 
+DIST_MUT_PCTS = [5, 10, 25]   # mutation rates shown in the activity-distribution grid
+
 
 class NegControlVariant:
     """Configurable negative-control GT for the hypothesis differential.
@@ -277,6 +279,53 @@ def make_coefficient_figures(variants):
 
 
 # ---------------------------------------------------------------------------
+# Activity-score distributions: variants (rows) x mutation rates (cols)
+# ---------------------------------------------------------------------------
+
+def make_activity_distribution_grid(variants, mut_pcts=DIST_MUT_PCTS, lib_size=LIB_SIZE):
+    """5 (variants) x 3 (mutation rates) grid of random-library GT score
+    histograms -- no surrogate training, GT scoring only."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    n_rows, n_cols = len(variants), len(mut_pcts)
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(3.6 * n_cols, 2.4 * n_rows),
+                              sharex=False, gridspec_kw={"hspace": 0.45, "wspace": 0.25})
+
+    for row, v in enumerate(variants):
+        wt_oh = v.wt_one_hot()
+        L = wt_oh.shape[0]
+        for col, pct in enumerate(mut_pcts):
+            mut_count = max(1, round(pct * L / 100))
+            rng = np.random.default_rng(SEED * 10_000 + pct * 100 + lib_size)
+            nuc_ids = _generate_pool(wt_oh, lib_size, mut_count, rng)
+            X = np.eye(4, dtype=np.float32)[nuc_ids]
+            y = v.score_all(X)[v.score_key]
+
+            ax = axes[row, col]
+            ax.hist(y, bins=60, color="#4C72B0", alpha=0.75,
+                    edgecolor="white", linewidth=0.3)
+            ax.axvline(0.0, color="black", linewidth=1.2, linestyle="--", label="WT")
+            ax.tick_params(labelsize=7)
+            if row == 0:
+                ax.set_title(f"{pct}% mutation rate", fontsize=10)
+            if col == 0:
+                ax.set_ylabel(v.name, fontsize=8)
+            if row == n_rows - 1:
+                ax.set_xlabel("Activity score", fontsize=8)
+            print(f"  [dist] {v.name}  mut{pct}%  n={len(y)}  "
+                  f"mean={float(np.mean(y)):+.3f}  std={float(np.std(y)):.3f}")
+
+    fig.suptitle(f"Negative-control variant activity distributions "
+                 f"(random libraries, lib_size={lib_size:,})", y=1.0, fontsize=12)
+    out_path = os.path.join(OUT_DIR, "negctrl_variant_activity_distributions_5x3.png")
+    fig.savefig(out_path, dpi=140, bbox_inches="tight")
+    plt.close(fig)
+    return out_path
+
+
+# ---------------------------------------------------------------------------
 # 10% mutation-rate / 20,000-sequence random-holdout Spearman rho
 # ---------------------------------------------------------------------------
 
@@ -314,9 +363,29 @@ def run_spearman(variants):
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--skip_coef", action="store_true",
+                        help="Skip the coefficient-map figures")
+    parser.add_argument("--skip_spearman", action="store_true",
+                        help="Skip surrogate training / rho_rand (fast: only distributions/coefs)")
+    parser.add_argument("--skip_dist", action="store_true",
+                        help="Skip the variants x mutation-rate activity-distribution grid")
+    args = parser.parse_args()
+
     variants = build_variants()
-    coef_fig = make_coefficient_figures(variants)
-    print(f"[coef] composite figure -> {coef_fig}")
+
+    if not args.skip_coef:
+        coef_fig = make_coefficient_figures(variants)
+        print(f"[coef] composite figure -> {coef_fig}")
+
+    if not args.skip_dist:
+        dist_fig = make_activity_distribution_grid(variants)
+        print(f"[dist] composite figure -> {dist_fig}")
+
+    if args.skip_spearman:
+        print("[skip] surrogate training / rho_rand")
+        return
 
     results = run_spearman(variants)
 

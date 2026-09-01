@@ -50,6 +50,28 @@ Individual full-detail figures (per-variant additive + pairwise panels) and the 
 
 All five span only 0.9985-1.0000 (range of 0.0015).
 
+## Activity-score distributions (variants x mutation rates)
+
+Random-library GT score histograms, 5 variants x 3 mutation rates (5%, 10%, 25%; lib_size
+20,000, or fewer when the exact-mutation-count sequence space is smaller than 20,000 -- e.g.
+6,838 unique 2-mutant sequences at 5%). GT scoring only, no surrogate training.
+
+![[2026-08-31_negctrl_variant_activity_distributions_5x3.png]]
+
+| Variant | Shape |
+| --- | --- |
+| V0 motif-only (current design) | Sharp WT-adjacent spike plus discrete lower clusters (sigmoid saturation around how many of the 5 motif positions are hit) |
+| V1 null / no motif | Smooth, unimodal, narrow; shifts left and widens only mildly as mutation rate increases |
+| V2 motif + leaky pairwise | Visually near-identical to V0 -- the weak leaky pairwise doesn't perturb the marginal score distribution |
+| V3 motif, linear (no nonlinearity) | Heavy left tail, no saturation ceiling -- unsquashed motif hits produce large-magnitude outliers, unlike every nonlinear variant |
+| V4 diffuse, moderate background | Smooth, unimodal, wider than V1 (5x background scale) but still no discrete clusters -- no privileged region means no saturating subpopulation |
+
+The nonlinearity, not the motif itself, is what produces V0/V2's multi-modal/clustered shape: V1
+and V4 (both nonlinear, no motif) stay smooth, while V3 (motif, no nonlinearity) loses the
+saturation ceiling and becomes heavy-tailed instead of clustered. This is a visible, qualitative
+difference between the variants that `rho_rand` does not surface -- worth carrying into the
+activity-balanced follow-up in Next steps below.
+
 ## Tested differential
 
 | Hypothesis | Executed check | Verdict | Evidence |
@@ -88,5 +110,6 @@ All five span only 0.9985-1.0000 (range of 0.0015).
 ## Archived artifacts
 
 - ![[2026-08-31_negctrl_variant_differential_coefficients.png]]
+- ![[2026-08-31_negctrl_variant_activity_distributions_5x3.png]]
 - [Results JSON](../../../mRNA_RBP/prototypes/negctrl_variant_differential/outputs/negctrl_variant_differential_results.json)
 - [Experiment script](../../../mRNA_RBP/scripts/experiments/negctrl_variant_differential.py)
